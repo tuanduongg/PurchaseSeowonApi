@@ -1,0 +1,56 @@
+/* eslint-disable prettier/prettier */
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+  DeleteDateColumn,
+  BeforeInsert,
+} from 'typeorm';
+
+import * as bcrypt from 'bcrypt';
+
+@Entity()
+export class User {
+  @PrimaryGeneratedColumn()
+  userID: string;
+
+  @Column({ unique: true })
+  username: string;
+
+  @Column()
+  password: string;
+
+  @Column()
+  departmentID: number;
+
+  @Column({ default: false })
+  isManager: boolean;
+
+  @Column({ nullable: true })
+  email: boolean;
+
+  @CreateDateColumn({ type: 'datetime' })
+  created_at: Date;
+
+  @UpdateDateColumn({ type: 'datetime' })
+  updated_at: Date;
+
+  @DeleteDateColumn({ type: 'datetime', nullable: true })
+  delete_at: Date;
+
+  @Column({ nullable: true })
+  updated_by: string;
+
+  @Column({ nullable: true })
+  deleted_by: string;
+
+  @BeforeInsert()
+  async hashPassword() {
+    this.password = await bcrypt.hash(
+      this.password,
+      process.env.ROUND_SALT || 10,
+    );
+  }
+}
