@@ -1,7 +1,8 @@
-import { Controller, Res } from '@nestjs/common';
+import { Controller, Get, Res, UseGuards, Request } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { Body, Post, HttpStatus } from '@nestjs/common';
 import { Response } from 'express';
+import { AuthGuard } from './auth.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -21,5 +22,11 @@ export class AuthController {
     return res
       .status(HttpStatus.UNAUTHORIZED)
       .send({ message: 'Login fail', status: HttpStatus.UNAUTHORIZED });
+  }
+
+  @UseGuards(AuthGuard)
+  @Get('profile')
+  getProfile(@Request() req) {
+    return req.user;
   }
 }

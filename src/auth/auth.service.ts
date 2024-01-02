@@ -16,6 +16,8 @@ export class AuthService {
       'bcrypt.compare(pass, user.password)',
       await bcrypt.compare(pass, user.password),
     );
+    console.log('pass', pass);
+    console.log('user.password', user.password);
     if (user && (await bcrypt.compare(pass, user.password))) {
       const payload = {
         username: user.username,
