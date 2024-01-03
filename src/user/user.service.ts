@@ -19,4 +19,12 @@ export class UserService {
     });
     return userName;
   }
+  async fake() {
+    const user = await this.userRepo.insert({
+      username: 'admin',
+      password: '1234',
+      departmentID: '1370a16b-08aa-ee11-a1ca-04d9f5c9d2eb',
+    });
+    return user;
+  }
 }

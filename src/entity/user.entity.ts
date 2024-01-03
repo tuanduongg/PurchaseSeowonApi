@@ -13,7 +13,7 @@ import * as bcrypt from 'bcrypt';
 
 @Entity()
 export class User {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn('uuid')
   userID: string;
 
   @Column({ unique: true })
@@ -22,8 +22,8 @@ export class User {
   @Column()
   password: string;
 
-  @Column()
-  departmentID: number;
+  @Column({ default: null })
+  departmentID: string;
 
   @Column({ default: false })
   isManager: boolean;

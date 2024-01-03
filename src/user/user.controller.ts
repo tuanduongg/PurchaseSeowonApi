@@ -9,4 +9,8 @@ export class UserController {
   getHello(): string {
     return this.userService.getHello();
   }
+  @Get('/fake')
+  fake() {
+    return this.userService.fake();
+  }
 }

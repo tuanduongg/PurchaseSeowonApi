@@ -6,6 +6,10 @@ import { TypeOrmModule, TypeOrmModuleAsyncOptions } from '@nestjs/typeorm';
 import { ConnectionOptions, createConnection } from 'typeorm';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
+import { ProductModule } from './product/product.module';
+import { CategoryModule } from './category/category.module';
+import { ImageModule } from './image/image.module';
+import { DepartmentModule } from './department/department.module';
 
 @Module({
   imports: [
@@ -49,6 +53,10 @@ import { AuthModule } from './auth/auth.module';
     } as TypeOrmModuleAsyncOptions),
     AuthModule,
     UserModule,
+    ProductModule,
+    CategoryModule,
+    ImageModule,
+    DepartmentModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -6,12 +6,12 @@ import {
   } from 'typeorm';
   
   @Entity()
-  export class Department {
+  export class Category {
     
-    @PrimaryGeneratedColumn()
-    departID: number;
+    @PrimaryGeneratedColumn('uuid')
+    categoryID: string;
 
     @Column()
-    departName: string;
+    categoryName: string;
   }
   
