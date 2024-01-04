@@ -9,15 +9,37 @@ export class ProductService {
     @InjectRepository(Product)
     private readonly productRepo: Repository<Product>,
   ) {}
-  async getAllIsShow(query) {
-    const take = query.take || 10;
-    const skip = query.skip || 0;
+
+  async changePublic(body) {
+    const productID = body.productID;
+    const product = await this.productRepo.findOne({ where: { productID } });
+    if (product) {
+      product.isShow = !product.isShow;
+      return await this.productRepo.save(product);
+    }
+    return null;
+  }
+  async getAllIsShow(query, isShowProp?) {
+    const take = query.rowPerPage || 10;
+    const skip = query.page || 0;
     const search = query.search || '';
+    const categoryID = query.categoryID || '';
+    const isShow = isShowProp ? isShowProp : false;
+
+    const objWhere = isShowProp
+      ? { productName: Like('%' + search + '%'), isShow, category: {} }
+      : { productName: Like('%' + search + '%') };
+
+    if (categoryID) {
+      objWhere.category = { categoryID };
+    } else {
+      delete objWhere.category;
+    }
 
     const [result, total] = await this.productRepo.findAndCount({
-      where: { productName: Like('%' + search + '%') },
-      relations: ['images'],
-      order: { created_at: 'ASC' },
+      where: objWhere,
+      relations: ['images', 'category'],
+      order: { created_at: 'DESC' },
       take: take,
       skip: skip,
     });
@@ -27,6 +49,7 @@ export class ProductService {
       count: total,
     };
   }
+
   async fakeData() {
     const data = [
       {
@@ -39,7 +62,7 @@ export class ProductService {
         description:
           'Kim Bấm số 10 Plus Đặc điểm: Kim bấm số 10 kích thước nhỏ sử dụng cho bấm kim số 10, có các nhãn hiệu để các bạn chọn lựa phù hợp cho dụng cụ bấm kim, phục vụ thuận tiện trong quá trình kẹp bấm giấy tờ tài liệu số lượng ít, định lượng giấy mỏng nhanh chóng và dễ dàng. Đóng gói: 20 hộp/ hộp lớn. Xuất xứ: Việt Nam Bảo quản: Tránh xa nguồn nhiệt và dầu mỡ. Công ty TNHH TM DV Văn Phòng Tổng Hợp Nam Phương chuyên cung cấp kim bấm các loại, giá cả hợp lý, hàng đảm bảo chất lượng',
 
-        categoryID: '89910D3C-EAA9-EE11-A1CA-04D9F5C9D2EB',
+        categoryID: '688e8c27-09aa-ee11-a1ca-04d9f5c9d2eb',
 
         isShow: true,
       },
@@ -52,7 +75,7 @@ export class ProductService {
 
         description: 'Ghim bấm đầu trònnnnn',
 
-        categoryID: '89910D3C-EAA9-EE11-A1CA-04D9F5C9D2EB',
+        categoryID: '6a8e8c27-09aa-ee11-a1ca-04d9f5c9d2eb',
 
         isShow: true,
       },
@@ -66,7 +89,7 @@ export class ProductService {
         description:
           'Công ty TNHH TM DV Văn Phòng Tổng Hợp Nam Phương chuyên cung cấp kim bấm các loại, giá cả hợp lý, hàng đảm bảo chất lượng.',
 
-        categoryID: '89910D3C-EAA9-EE11-A1CA-04D9F5C9D2EB',
+        categoryID: '688e8c27-09aa-ee11-a1ca-04d9f5c9d2eb',
 
         isShow: false,
       },

@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import { Entity, Column, ManyToOne} from 'typeorm';
+import { Entity, Column, ManyToOne, JoinColumn } from 'typeorm';
 import { Product } from './product.entity';
 
 @Entity()
@@ -19,6 +19,7 @@ export class Image {
   @Column({ default: true })
   isShow: string;
 
-  @ManyToOne(() => Product, product => product.images)
+  @ManyToOne(() => Product, (product) => product.images)
+  @JoinColumn({ name: 'productID', referencedColumnName: 'productID' })
   product: Product;
 }

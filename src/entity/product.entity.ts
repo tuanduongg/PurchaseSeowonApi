@@ -7,8 +7,11 @@ import {
   DeleteDateColumn,
   PrimaryGeneratedColumn,
   OneToMany,
+  ManyToOne,
+  JoinColumn,
 } from 'typeorm';
 import { Image } from './image.entity';
+import { Category } from './category.entity';
 
 @Entity()
 export class Product {
@@ -27,7 +30,7 @@ export class Product {
   @Column({ type: 'nvarchar', length: 'MAX', nullable: true })
   description: string;
 
-  @Column()
+  @Column({ nullable: true })
   categoryID: string;
 
   @Column()
@@ -50,6 +53,11 @@ export class Product {
 
   @Column({ nullable: true })
   deleted_by: string;
-  @OneToMany(() => Image, image => image.product)
+
+  @OneToMany(() => Image, (image) => image.product)
   images: Image[];
+
+  @ManyToOne(() => Category, (category) => category.products)
+  @JoinColumn({ name: 'categoryID', referencedColumnName: 'categoryID' })
+  category: Category;
 }
