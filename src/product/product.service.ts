@@ -27,15 +27,18 @@ export class ProductService {
     const isShow = isShowProp ? isShowProp : false;
 
     const objWhere = isShowProp
-      ? { productName: Like('%' + search + '%'), isShow, category: {} }
+      ? {
+          productName: Like('%' + search + '%'),
+          isShow,
+          categoryID: categoryID,
+        }
       : { productName: Like('%' + search + '%') };
 
     if (categoryID) {
-      objWhere.category = { categoryID };
+      objWhere.categoryID = categoryID;
     } else {
-      delete objWhere.category;
+      delete objWhere.categoryID;
     }
-
     const [result, total] = await this.productRepo.findAndCount({
       where: objWhere,
       relations: ['images', 'category'],
@@ -49,7 +52,6 @@ export class ProductService {
       count: total,
     };
   }
-
   async fakeData() {
     const data = [
       {
@@ -92,6 +94,34 @@ export class ProductService {
         categoryID: '688e8c27-09aa-ee11-a1ca-04d9f5c9d2eb',
 
         isShow: false,
+      },
+      {
+        productName: 'Kim bấm số 10 Plus',
+        // image: 'https://cdn.fast.vn/tmp/20210217090347-6.JPG',
+        price: 5000,
+      },
+      {
+        productName: 'Kẹp giấy đầu tròn C82 LOẠI LỚN',
+        // image: 'https://cdn.fast.vn/tmp/20210610144411-c82-2.jpg',
+        price: 5600,
+      },
+      {
+        productName: 'Giấy in A4 Double A',
+        // image:
+        //   'https://vanphong-pham.com/wp-content/uploads/2021/10/giay-a4-double.jpg',
+        price: 120000,
+      },
+      {
+        productName: 'Găng tay len kim 10 ngà 60g',
+        // image:
+        //   'https://img.super-mro.com/super-mro/2023/09/w550/gang-tay-len-kim-10-nga-60g.jpg.webp',
+        price: 5600,
+      },
+      {
+        productName: 'Băng dính trong',
+        // image:
+        //   'https://bizweb.dktcdn.net/thumb/1024x1024/100/387/548/products/bang-dinh-trong-5cm.png?v=1589959476467',
+        price: 20000,
       },
     ];
     const products = await this.productRepo.insert(data);

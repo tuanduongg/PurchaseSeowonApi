@@ -1,6 +1,7 @@
-import { Controller, Get, HttpStatus, Res } from '@nestjs/common';
+import { Controller, Get, HttpStatus, Res, UseGuards } from '@nestjs/common';
 import { Response } from 'express';
 import { CategoryService } from './category.service';
+import { AuthGuard } from 'src/auth/auth.guard';
 
 @Controller('/category')
 export class CategoryController {
@@ -11,6 +12,8 @@ export class CategoryController {
     const data = await this.cateService.fake();
     return res.status(HttpStatus.OK).send(data);
   }
+
+  @UseGuards(AuthGuard)
   @Get('/all')
   async getAll(@Res() res: Response) {
     const data = await this.cateService.getAll();

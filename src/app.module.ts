@@ -10,6 +10,7 @@ import { ProductModule } from './product/product.module';
 import { CategoryModule } from './category/category.module';
 import { ImageModule } from './image/image.module';
 import { DepartmentModule } from './department/department.module';
+import { OrderModule } from './order/order.module';
 
 @Module({
   imports: [
@@ -30,12 +31,6 @@ import { DepartmentModule } from './department/department.module';
           requestTimeout: 30000,
           // entities: [
           //   User,
-          //   Color,
-          //   Department,
-          //   ListAPI,
-          //   Permisstion,
-          //   Stage,
-          //   Time,
           // ],
           synchronize: true,
           pool: {
@@ -57,6 +52,7 @@ import { DepartmentModule } from './department/department.module';
     CategoryModule,
     ImageModule,
     DepartmentModule,
+    OrderModule,
   ],
   controllers: [AppController],
   providers: [AppService],
