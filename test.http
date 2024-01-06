@@ -12,5 +12,5 @@
 
 # GET http://localhost:8088/api/category/all HTTP/1.1
 # Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwiaWQiOjEsImRlcGFydG1lbnRJRCI6MSwiaXNNYW5hZ2VyIjp0cnVlLCJlbWFpbCI6bnVsbCwiaWF0IjoxNzA0MjQzODc4LCJleHAiOjE3MDQzMzAyNzh9.n0nhVaAJG_kXBrtCqeXaGKGdXjxEzKfVkCNdemzWDHo
-POST http://localhost:8088/api/product/public HTTP/1.1
+GET http://localhost:8088/api/product/fake HTTP/1.1
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwiaWQiOjEsImRlcGFydG1lbnRJRCI6MSwiaXNNYW5hZ2VyIjp0cnVlLCJlbWFpbCI6bnVsbCwiaWF0IjoxNzA0MjQzODc4LCJleHAiOjE3MDQzMzAyNzh9.n0nhVaAJG_kXBrtCqeXaGKGdXjxEzKfVkCNdemzWDHo
