@@ -19,11 +19,37 @@ export class ProductService {
     }
     return null;
   }
+
+  async addProduct(product, user, files) {
+    const productNew = await this.productRepo.insert({
+      productName: product?.name,
+      price: product?.price,
+      description: product?.description,
+      inventory: product?.inventory,
+      categoryID: product?.category,
+      isShow: true,
+    });
+    console.log('product new', productNew);
+    if (productNew) {
+      return await this.productRepo.insert(productNew);
+    }
+    return null;
+  }
+  async deleteProduct(body, request) {
+    console.log('request', request);
+    const productID = body.productID;
+    const product = await this.productRepo.findOne({ where: { productID } });
+    if (product) {
+      product.isShow = !product.isShow;
+      return await this.productRepo.save(product);
+    }
+    return null;
+  }
+
   async getAllIsShow(query, isShowProp?) {
-    console.log('query', query);
-    const take = +query.rowsPerPage || 12;
-    let skip = query.page * take;
-    console.log('skip * take', skip * take);
+    const take = +query.rowsPerPage || 10;
+    const page = query.page || 0;
+    const skip = page * take;
     const search = query.search || '';
     const categoryID = query.categoryID || '';
     const isShow = isShowProp ? isShowProp : false;
@@ -57,7 +83,7 @@ export class ProductService {
   async fakeData() {
     const data = [
       {
-        productName: 'Giấy A4',
+        productName: 'Giấy A4 2',
 
         price: 120000,
 
@@ -66,12 +92,12 @@ export class ProductService {
         description:
           'Kim Bấm số 10 Plus Đặc điểm: Kim bấm số 10 kích thước nhỏ sử dụng cho bấm kim số 10, có các nhãn hiệu để các bạn chọn lựa phù hợp cho dụng cụ bấm kim, phục vụ thuận tiện trong quá trình kẹp bấm giấy tờ tài liệu số lượng ít, định lượng giấy mỏng nhanh chóng và dễ dàng. Đóng gói: 20 hộp/ hộp lớn. Xuất xứ: Việt Nam Bảo quản: Tránh xa nguồn nhiệt và dầu mỡ. Công ty TNHH TM DV Văn Phòng Tổng Hợp Nam Phương chuyên cung cấp kim bấm các loại, giá cả hợp lý, hàng đảm bảo chất lượng',
 
-        categoryID: 'f7022917-43ac-ee11-a1cd-08bfb89bcbb5',
+        categoryID: '698E8C27-09AA-EE11-A1CA-04D9F5C9D2EB',
 
         isShow: true,
       },
       {
-        productName: 'Ghim bấm giấy',
+        productName: 'Ghim bấm giấy 2',
 
         price: 1200,
 
@@ -79,12 +105,12 @@ export class ProductService {
 
         description: 'Ghim bấm đầu trònnnnn',
 
-        categoryID: 'f7022917-43ac-ee11-a1cd-08bfb89bcbb5',
+        categoryID: '698E8C27-09AA-EE11-A1CA-04D9F5C9D2EB',
 
         isShow: true,
       },
       {
-        productName: 'Kẹp giấy đầu tròn c32',
+        productName: 'Kẹp giấy đầu tròn c32 2',
 
         price: 3200,
 
@@ -93,12 +119,12 @@ export class ProductService {
         description:
           'Công ty TNHH TM DV Văn Phòng Tổng Hợp Nam Phương chuyên cung cấp kim bấm các loại, giá cả hợp lý, hàng đảm bảo chất lượng.',
 
-        categoryID: 'f5022917-43ac-ee11-a1cd-08bfb89bcbb5',
+        categoryID: '698E8C27-09AA-EE11-A1CA-04D9F5C9D2EB',
 
         isShow: false,
       },
       {
-        productName: 'Kim bấm số 10 Plus',
+        productName: 'Kim bấm số 10 Plus 2',
         // image: 'https://cdn.fast.vn/tmp/20210217090347-6.JPG',
         price: 5000,
         inventory: 58,
@@ -106,7 +132,7 @@ export class ProductService {
         description:
           'Công ty TNHH TM DV Văn Phòng Tổng Hợp Nam Phương chuyên cung cấp kim bấm các loại, giá cả hợp lý, hàng đảm bảo chất lượng.',
 
-        categoryID: 'f5022917-43ac-ee11-a1cd-08bfb89bcbb5',
+        categoryID: '698E8C27-09AA-EE11-A1CA-04D9F5C9D2EB',
 
         isShow: false,
       },
@@ -119,12 +145,12 @@ export class ProductService {
         description:
           'Công ty TNHH TM DV Văn Phòng Tổng Hợp Nam Phương chuyên cung cấp kim bấm các loại, giá cả hợp lý, hàng đảm bảo chất lượng.',
 
-        categoryID: 'f5022917-43ac-ee11-a1cd-08bfb89bcbb5',
+        categoryID: '698E8C27-09AA-EE11-A1CA-04D9F5C9D2EB',
 
         isShow: false,
       },
       {
-        productName: 'Giấy in A4 Double A',
+        productName: 'Giấy in A4 Double A 2',
         // image:
         //   'https://vanphong-pham.com/wp-content/uploads/2021/10/giay-a4-double.jpg',
         price: 120000,
@@ -133,12 +159,12 @@ export class ProductService {
         description:
           'Công ty TNHH TM DV Văn Phòng Tổng Hợp Nam Phương chuyên cung cấp kim bấm các loại, giá cả hợp lý, hàng đảm bảo chất lượng.',
 
-        categoryID: 'f5022917-43ac-ee11-a1cd-08bfb89bcbb5',
+        categoryID: '698E8C27-09AA-EE11-A1CA-04D9F5C9D2EB',
 
         isShow: false,
       },
       {
-        productName: 'Găng tay len kim 10 ngà 60g',
+        productName: 'Găng tay len kim 10 ngà 60g 2',
         // image:
         //   'https://img.super-mro.com/super-mro/2023/09/w550/gang-tay-len-kim-10-nga-60g.jpg.webp',
         price: 5600,
@@ -147,12 +173,12 @@ export class ProductService {
         description:
           'Công ty TNHH TM DV Văn Phòng Tổng Hợp Nam Phương chuyên cung cấp kim bấm các loại, giá cả hợp lý, hàng đảm bảo chất lượng.',
 
-        categoryID: 'f5022917-43ac-ee11-a1cd-08bfb89bcbb5',
+        categoryID: '698E8C27-09AA-EE11-A1CA-04D9F5C9D2EB',
 
         isShow: false,
       },
       {
-        productName: 'Băng dính trong',
+        productName: 'Băng dính trong 2',
         // image:
         //   'https://bizweb.dktcdn.net/thumb/1024x1024/100/387/548/products/bang-dinh-trong-5cm.png?v=1589959476467',
         price: 20000,
@@ -161,7 +187,7 @@ export class ProductService {
         description:
           'Công ty TNHH TM DV Văn Phòng Tổng Hợp Nam Phương chuyên cung cấp kim bấm các loại, giá cả hợp lý, hàng đảm bảo chất lượng.',
 
-        categoryID: 'f5022917-43ac-ee11-a1cd-08bfb89bcbb5',
+        categoryID: '698E8C27-09AA-EE11-A1CA-04D9F5C9D2EB',
 
         isShow: false,
       },

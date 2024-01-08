@@ -11,9 +11,16 @@ import { CategoryModule } from './category/category.module';
 import { ImageModule } from './image/image.module';
 import { DepartmentModule } from './department/department.module';
 import { OrderModule } from './order/order.module';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
+import { FileModule } from './file/file.module';
 
 @Module({
   imports: [
+    // ServeStaticModule.forRoot({
+    //   serveRoot: '/public',
+    //   rootPath: join(__dirname, '..', 'public'), // <-- path to the static files
+    // }),
     ConfigModule.forRoot({
       isGlobal: true,
     }),
@@ -46,6 +53,10 @@ import { OrderModule } from './order/order.module';
         return connectionOptions;
       },
     } as TypeOrmModuleAsyncOptions),
+    // ServeStaticModule.forRoot({
+    //   rootPath: join(__dirname, '..', 'public'),
+    //   serveStaticOptions: { index: false },
+    // }),
     AuthModule,
     UserModule,
     ProductModule,
@@ -53,6 +64,7 @@ import { OrderModule } from './order/order.module';
     ImageModule,
     DepartmentModule,
     OrderModule,
+    FileModule
   ],
   controllers: [AppController],
   providers: [AppService],
