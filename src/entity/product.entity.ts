@@ -12,13 +12,14 @@ import {
 } from 'typeorm';
 import { Image } from './image.entity';
 import { Category } from './category.entity';
+import { Unit } from './unit.entity';
 
 @Entity()
 export class Product {
   @PrimaryGeneratedColumn('uuid')
   productID: string;
 
-  @Column()
+  @Column({ nullable: true })
   productName: string;
 
   @Column('decimal', { precision: 8, scale: 2 })
@@ -32,6 +33,9 @@ export class Product {
 
   @Column({ nullable: true })
   categoryID: string;
+
+  @Column({ nullable: true })
+  unitID: string;
 
   @Column()
   isShow: boolean;
@@ -60,4 +64,8 @@ export class Product {
   @ManyToOne(() => Category, (category) => category.products)
   @JoinColumn({ name: 'categoryID', referencedColumnName: 'categoryID' })
   category: Category;
+
+  @ManyToOne(() => Unit, (unit) => unit.products)
+  @JoinColumn({ name: 'unitID', referencedColumnName: 'unitID' })
+  unit: Unit;
 }

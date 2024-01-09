@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Image } from 'src/entity/image.entity';
 import { Product } from 'src/entity/product.entity';
 import { Like, Repository } from 'typeorm';
 
@@ -8,6 +9,8 @@ export class ProductService {
   constructor(
     @InjectRepository(Product)
     private readonly productRepo: Repository<Product>,
+    @InjectRepository(Image)
+    private readonly imageRepo: Repository<Image>,
   ) {}
 
   async changePublic(body) {
@@ -23,28 +26,78 @@ export class ProductService {
   async addProduct(product, user, files) {
     const productNew = await this.productRepo.insert({
       productName: product?.name,
-      price: product?.price,
+      price: +product?.price,
       description: product?.description,
-      inventory: product?.inventory,
+      inventory: +product?.inventory,
       categoryID: product?.category,
+      unitID: product?.unitID,
       isShow: true,
+      created_by: user?.username,
     });
-    console.log('product new', productNew);
     if (productNew) {
-      return await this.productRepo.insert(productNew);
+      const productID = productNew?.raw[0]?.productID;
+      let images = {};
+      if (files && files?.length > 0) {
+        const arrFiles = [];
+        files.map((item, index) => {
+          arrFiles.push({
+            productID: productID,
+            url: `${item?.filename}`,
+            title: `${item?.originalname}`,
+          });
+        });
+        images = await this.imageRepo.insert(arrFiles);
+      }
+      return { productNew, images };
+      // return await this.productRepo.insert([productNew]);
     }
     return null;
   }
-  async deleteProduct(body, request) {
-    console.log('request', request);
-    const productID = body.productID;
-    const product = await this.productRepo.findOne({ where: { productID } });
-    if (product) {
-      product.isShow = !product.isShow;
-      return await this.productRepo.save(product);
+
+  async editProduct(product, user, files) {
+    const productID = product?.productID;
+    if (productID) {
+      const updates = {
+        productName: product?.name,
+        price: product?.price,
+        description: product?.description,
+        inventory: product?.inventory,
+        categoryID: product?.category,
+        unitID: product?.unitID,
+        isShow: true,
+        updated_by: user?.username,
+      };
+      const updateResult = await this.productRepo.update(productID, updates);
+      if (updateResult.affected === 1) {
+        let images = {};
+        if (files && files?.length > 0) {
+          const arrFiles = [];
+          files.map((item, index) => {
+            arrFiles.push({
+              productID: productID,
+              url: `${item?.filename}`,
+              title: `${item?.originalname}`,
+            });
+          });
+          images = await this.imageRepo.insert(arrFiles);
+        }
+        return { updateResult, images };
+      }
     }
     return null;
   }
+  
+
+  // async deleteProduct(body, request) {
+  //   console.log('request', request);
+  //   const productID = body.productID;
+  //   const product = await this.productRepo.findOne({ where: { productID } });
+  //   if (product) {
+  //     product.isShow = !product.isShow;
+  //     return await this.productRepo.save(product);
+  //   }
+  //   return null;
+  // }
 
   async getAllIsShow(query, isShowProp?) {
     const take = +query.rowsPerPage || 10;

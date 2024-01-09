@@ -9,19 +9,15 @@ import { join } from 'path';
 export class FileController {
   constructor(private readonly fileService: FileService) {}
 
-  @Get(':folder/:filename')
-  getFile(
-    @Param('filename') filename: string,
-    @Param('folder') folder: string,
-    @Res() res: Response,
-  ) {
+  @Get('/:filename')
+  getFile(@Param('filename') filename: string, @Res() res: Response) {
     // console.log('fileName', filename);
     // console.log('__dirname', __dirname);
     // console.log('join(__dirname)', join(__dirname, '..', 'public'));
 
     try {
       const filePath = path
-        .join(__dirname, '../public', `${folder}\\${filename}`)
+        .join(__dirname, '../public', `${filename}`)
         .replace('\\dist\\src', '');
       console.log('filePath', filePath);
       // Check if the file exists

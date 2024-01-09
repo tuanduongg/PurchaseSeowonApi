@@ -2,16 +2,18 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Image } from 'src/entity/image.entity';
 import { Repository } from 'typeorm';
+import * as fs from 'fs';
+import { join } from 'path';
 
 @Injectable()
 export class ImageService {
   constructor(
     @InjectRepository(Image)
-    private categoryRepo: Repository<Image>,
+    private imageRepo: Repository<Image>,
   ) {}
 
   async fake() {
-    return this.categoryRepo.insert([
+    return this.imageRepo.insert([
       {
         productID: 'da025e2f-09aa-ee11-a1ca-04d9f5c9d2eb',
         url: '/image.jpg',
@@ -23,6 +25,26 @@ export class ImageService {
     ]);
   }
   async getAll() {
-    return await this.categoryRepo.find({});
+    return await this.imageRepo.find({});
+  }
+  async deleteByID(id) {
+    try {
+      const recordToDelete = await this.imageRepo.findOne({
+        where: { imageID: id },
+      });
+      console.log('recordToDelete', recordToDelete);
+      if (recordToDelete) {
+        const remove = await this.imageRepo.remove(recordToDelete);
+        const imagePath =
+          join(__dirname, '..', 'public').replace('\\dist', '') +
+          '\\' +
+          recordToDelete?.url;
+        console.log(imagePath);
+        fs.unlinkSync(imagePath);
+        return true;
+      }
+    } catch (error) {
+      return null;
+    }
   }
 }

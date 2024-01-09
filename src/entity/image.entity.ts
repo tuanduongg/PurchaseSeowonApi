@@ -17,7 +17,7 @@ export class Image {
   title: string;
 
   @Column({ default: true })
-  isShow: string;
+  isShow: boolean;
 
   @ManyToOne(() => Product, (product) => product.images)
   @JoinColumn({ name: 'productID', referencedColumnName: 'productID' })

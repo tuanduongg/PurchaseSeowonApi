@@ -11,9 +11,8 @@ import { CategoryModule } from './category/category.module';
 import { ImageModule } from './image/image.module';
 import { DepartmentModule } from './department/department.module';
 import { OrderModule } from './order/order.module';
-import { ServeStaticModule } from '@nestjs/serve-static';
-import { join } from 'path';
 import { FileModule } from './file/file.module';
+import { UnitModule } from './unit/unit.module';
 
 @Module({
   imports: [
@@ -64,7 +63,9 @@ import { FileModule } from './file/file.module';
     ImageModule,
     DepartmentModule,
     OrderModule,
-    FileModule
+    FileModule,
+    UnitModule,
+    ImageModule,
   ],
   controllers: [AppController],
   providers: [AppService],

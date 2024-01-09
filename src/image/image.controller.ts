@@ -1,19 +1,33 @@
-import { Controller, Get, HttpStatus, Res } from '@nestjs/common';
+import { Body, Controller, Get, HttpStatus, Post, Res } from '@nestjs/common';
 import { Response } from 'express';
 import { ImageService } from './image.service';
 
 @Controller('/image')
 export class ImageController {
-  constructor(private readonly cateService: ImageService) {}
+  constructor(private readonly imageService: ImageService) {}
 
   @Get('/fake')
   async fakeData(@Res() res: Response) {
-    const data = await this.cateService.fake();
+    const data = await this.imageService.fake();
     return res.status(HttpStatus.OK).send(data);
   }
   @Get('/all')
   async getAll(@Res() res: Response) {
-    const data = await this.cateService.getAll();
+    const data = await this.imageService.getAll();
     return res.status(HttpStatus.OK).send(data);
+  }
+  @Post('/delete')
+  async deleteByID(@Body() body, @Res() res: Response) {
+    const id = body?.imageID;
+    console.log('body', body);
+    if (id) {
+      const data = await this.imageService.deleteByID(id);
+      if (data) {
+        return res.status(HttpStatus.OK).send(data);
+      }
+    }
+    return res
+      .status(HttpStatus.BAD_REQUEST)
+      .send({ message: 'Cannot delete image' });
   }
 }

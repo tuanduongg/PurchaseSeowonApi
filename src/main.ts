@@ -8,6 +8,8 @@ async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
   app.setGlobalPrefix('api');
   // app.useStaticAssets(join(__dirname, '..', 'public'));
+  app.useStaticAssets(join(__dirname, '..', 'public').replace('\\dist', ''));
+  console.log('join', join(__dirname, '..', 'public'));
   const configService = app.get(ConfigService);
   const port = configService.get('PORT') || 8000;
   app.enableCors();

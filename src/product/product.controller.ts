@@ -14,7 +14,7 @@ import { ProductService } from './product.service';
 import { Response, Request } from 'express';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { FilesInterceptor } from '@nestjs/platform-express';
-import { multerConfig } from 'config/multer.config';
+import { multerConfig } from 'src/config/multer.config';
 
 @Controller('/product')
 export class ProductController {
@@ -39,12 +39,12 @@ export class ProductController {
     return res.status(HttpStatus.OK).send(data);
   }
 
-  @UseGuards(AuthGuard)
-  @Post('/delete')
-  async delete(@Body() body, @Req() request: Request, @Res() res: Response) {
-    const data = await this.productService.deleteProduct(body, request);
-    return res.status(HttpStatus.OK).send(data);
-  }
+  // @UseGuards(AuthGuard)
+  // @Post('/delete')
+  // async delete(@Body() body, @Req() request: Request, @Res() res: Response) {
+  //   const data = await this.productService.(body, request);
+  //   return res.status(HttpStatus.OK).send(data);
+  // }
 
   @UseGuards(AuthGuard)
   @Post('/changePublic')
@@ -61,18 +61,16 @@ export class ProductController {
       .status(HttpStatus.BAD_REQUEST)
       .send({ message: 'Cannot found product!' });
   }
+
   @UseGuards(AuthGuard)
   @Post('/add')
-  @UseInterceptors(FilesInterceptor('files', 20, multerConfig))
+  @UseInterceptors(FilesInterceptor('files', 10, multerConfig))
   async addProduct(
     @Body() body,
     @Req() request: Request,
     @Res() res: Response,
     @UploadedFiles() files: Array<Express.Multer.File>,
   ) {
-    console.log('files', files);
-    console.log('body', body);
-    console.log('request?.user', request?.user);
     if (body?.data) {
       const product = JSON.parse(body?.data);
       const data = await this.productService.addProduct(
@@ -87,6 +85,31 @@ export class ProductController {
     return res
       .status(HttpStatus.BAD_REQUEST)
       .send({ message: 'Cannot add product!' });
+  }
+
+  @UseGuards(AuthGuard)
+  @Post('/edit')
+  @UseInterceptors(FilesInterceptor('files', 10, multerConfig))
+  async editProduct(
+    @Body() body,
+    @Req() request: Request,
+    @Res() res: Response,
+    @UploadedFiles() files: Array<Express.Multer.File>,
+  ) {
+    if (body?.data) {
+      const product = JSON.parse(body?.data);
+      const data = await this.productService.editProduct(
+        product,
+        request?.user,
+        files,
+      );
+      if (data) {
+        return res.status(HttpStatus.OK).send(data);
+      }
+    }
+    return res
+      .status(HttpStatus.BAD_REQUEST)
+      .send({ message: 'Cannot edit product!' });
   }
 
   @Get('/fake')
