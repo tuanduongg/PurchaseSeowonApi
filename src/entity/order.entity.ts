@@ -16,14 +16,16 @@ export class Order {
   @Column()
   userID: string;
 
-  @Column('decimal', { precision: 8, scale: 2 })
-  total: number;
+  @Column({ nullable: true })
+  total: string;
 
   @Column()
   reciever: string;
 
   @Column()
   address: string;
+  @Column()
+  note: string;
 
   @Column()
   status: string;

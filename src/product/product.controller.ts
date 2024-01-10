@@ -112,9 +112,9 @@ export class ProductController {
       .send({ message: 'Cannot edit product!' });
   }
 
-  @Get('/fake')
-  async fakeData(@Res() res: Response) {
-    const data = await this.productService.fakeData();
-    return res.status(HttpStatus.OK).send(data);
-  }
+  // @Get('/fake')
+  // async fakeData(@Res() res: Response) {
+  //   const data = await this.productService.fakeData();
+  //   return res.status(HttpStatus.OK).send(data);
+  // }
 }

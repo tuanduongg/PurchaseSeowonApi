@@ -9,13 +9,16 @@ export class OrderDetail {
   @Column({ primary: true })
   productID: string;
 
-  @Column('decimal', { precision: 8, scale: 2 })
-  price: number;
+  @Column()
+  price: string;
 
   @Column()
   quantity: number;
 
-//   @ManyToOne(() => Order, (order) => order.orderID)
-//   @JoinColumn({ name: 'orderID' })
-//   order?: Order;
+  @Column()
+  unit: string;
+
+  //   @ManyToOne(() => Order, (order) => order.orderID)
+  //   @JoinColumn({ name: 'orderID' })
+  //   order?: Order;
 }

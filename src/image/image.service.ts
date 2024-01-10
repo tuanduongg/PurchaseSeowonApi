@@ -32,15 +32,15 @@ export class ImageService {
       const recordToDelete = await this.imageRepo.findOne({
         where: { imageID: id },
       });
-      console.log('recordToDelete', recordToDelete);
       if (recordToDelete) {
-        const remove = await this.imageRepo.remove(recordToDelete);
         const imagePath =
           join(__dirname, '..', 'public').replace('\\dist', '') +
           '\\' +
           recordToDelete?.url;
-        console.log(imagePath);
+        console.log('imagePath', imagePath);
+        const remove = await this.imageRepo.remove(recordToDelete);
         fs.unlinkSync(imagePath);
+        console.log('remove', remove);
         return true;
       }
     } catch (error) {

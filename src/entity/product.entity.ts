@@ -22,8 +22,8 @@ export class Product {
   @Column({ nullable: true })
   productName: string;
 
-  @Column('decimal', { precision: 8, scale: 2 })
-  price: number;
+  @Column({ nullable: true })
+  price: string;
 
   @Column({ default: 0 })
   inventory: number;
