@@ -13,6 +13,7 @@ import {
 import { Image } from './image.entity';
 import { Category } from './category.entity';
 import { Unit } from './unit.entity';
+import { OrderDetail } from './order_detail.entity';
 
 @Entity()
 export class Product {
@@ -68,4 +69,7 @@ export class Product {
   @ManyToOne(() => Unit, (unit) => unit.products)
   @JoinColumn({ name: 'unitID', referencedColumnName: 'unitID' })
   unit: Unit;
+
+  @OneToMany(() => OrderDetail, (orderDetail) => orderDetail.product)
+  orderDetail: OrderDetail[];
 }

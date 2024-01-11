@@ -7,9 +7,12 @@ import {
   UpdateDateColumn,
   DeleteDateColumn,
   BeforeInsert,
+  ManyToOne,
+  JoinColumn,
 } from 'typeorm';
 
 import * as bcrypt from 'bcrypt';
+import { Department } from './department.entity';
 
 @Entity()
 export class User {
@@ -29,7 +32,7 @@ export class User {
   isManager: boolean;
 
   @Column({ nullable: true })
-  email: boolean;
+  email: string;
 
   @CreateDateColumn({ type: 'datetime' })
   created_at: Date;
@@ -46,6 +49,9 @@ export class User {
   @Column({ nullable: true })
   deleted_by: string;
 
+  @Column({ nullable: true })
+  isApprover: boolean;
+
   @BeforeInsert()
   async hashPassword() {
     this.password = await bcrypt.hash(
@@ -53,4 +59,7 @@ export class User {
       process.env.ROUND_SALT || 10,
     );
   }
+  @ManyToOne(() => Department, (department) => department.users)
+  @JoinColumn({ name: 'departmentID', referencedColumnName: 'departID' })
+  department: Department;
 }

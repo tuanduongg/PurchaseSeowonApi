@@ -1,12 +1,18 @@
 /* eslint-disable prettier/prettier */
-import { Entity, Column } from 'typeorm';
+import { Entity, Column, ManyToOne, JoinColumn, PrimaryGeneratedColumn } from 'typeorm';
+import { Order } from './order.entity';
+import { Product } from './product.entity';
 
 @Entity()
 export class OrderDetail {
-  @Column({ primary: true })
+  
+  @PrimaryGeneratedColumn('uuid')
+  orderDetailID: string;
+
+  @Column()
   orderID: string;
 
-  @Column({ primary: true })
+  @Column()
   productID: string;
 
   @Column()
@@ -18,7 +24,14 @@ export class OrderDetail {
   @Column()
   unit: string;
 
-  //   @ManyToOne(() => Order, (order) => order.orderID)
-  //   @JoinColumn({ name: 'orderID' })
-  //   order?: Order;
+  // @ManyToOne(() => Order, (order) => order.orderDetail)
+  // @JoinColumn({ name: 'orderID', referencedColumnName: 'orderID' })
+  // order: Order;
+  @ManyToOne(() => Order, (order) => order.orderDetail)
+  @JoinColumn({ name: 'orderID', referencedColumnName: 'orderID' })
+  order: Order;
+
+  @ManyToOne(() => Product, (product) => product.orderDetail)
+  @JoinColumn({ name: 'productID', referencedColumnName: 'productID' })
+  product: Product;
 }

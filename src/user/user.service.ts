@@ -10,7 +10,6 @@ export class UserService {
     private userRepo: Repository<User>,
   ) {}
   getHello(): string {
-    console.log('process.env.ROUND_SALT', process.env.ROUND_SALT || 10);
     return 'Hello World!!!!!!';
   }
   async findByUsername(username) {
@@ -18,6 +17,14 @@ export class UserService {
       where: { username: username },
     });
     return userName;
+  }
+  async getUser(request) {
+    const userID = request?.user?.id;
+    const user = await this.userRepo.findOneOrFail({
+      where: { userID },
+      relations: ['department'],
+    });
+    return user;
   }
   async fake() {
     const user = await this.userRepo.insert({

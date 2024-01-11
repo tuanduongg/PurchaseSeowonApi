@@ -6,12 +6,17 @@ import {
   UpdateDateColumn,
   DeleteDateColumn,
   PrimaryGeneratedColumn,
+  OneToMany,
 } from 'typeorm';
+import { OrderDetail } from './order_detail.entity';
 
 @Entity()
 export class Order {
   @PrimaryGeneratedColumn('uuid')
   orderID: string;
+
+  @Column({ unique: true })
+  code: string;
 
   @Column()
   userID: string;
@@ -47,4 +52,7 @@ export class Order {
 
   @Column({ nullable: true })
   deleted_by: string;
+
+  @OneToMany(() => OrderDetail, (orderDetail) => orderDetail.order)
+  orderDetail: OrderDetail[];
 }

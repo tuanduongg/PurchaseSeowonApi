@@ -11,18 +11,11 @@ export class AuthService {
   ) {}
   async signIn(username: string, pass: string): Promise<any> {
     const user = await this.userService.findByUsername(username);
-    console.log('user', user);
-    console.log(
-      'bcrypt.compare(pass, user.password)',
-      await bcrypt.compare(pass, user.password),
-    );
-    console.log('pass', pass);
-    console.log('user.password', user.password);
     if (user && (await bcrypt.compare(pass, user.password))) {
       const payload = {
         username: user.username,
         id: user.userID,
-        departmentID: user.departmentID,
+        department: user.department,
         isManager: user.isManager,
         email: user.email,
       };

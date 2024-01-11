@@ -3,8 +3,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Order } from 'src/entity/order.entity';
 import { OrderDetail } from 'src/entity/order_detail.entity';
 import { OrderEnum } from 'src/enum/order.enum';
-import { getSubTotal } from 'src/helper/helper';
-import { Repository } from 'typeorm';
+import { getSubTotal, ranDomUID } from 'src/helper/helper';
+import { Between, Like, Repository } from 'typeorm';
 
 @Injectable()
 export class OrderService {
@@ -30,9 +30,41 @@ export class OrderService {
       // },
     ]);
   }
-  async getAll() {
-    return await this.orderRepo.find({});
+  async getAll(query) {
+    const take = +query.rowsPerPage || 10;
+    const page = +query.page || 0;
+    const skip = page * take;
+    const search = query.search || '';
+    const fromDate = query.fromDate ? new Date(query.fromDate) : new Date();
+    const toDate = query.toDate ? new Date(query.toDate) : new Date();
+    const status = query.status;
+    const objWhere = {
+      code: Like('%' + search + '%'),
+      created_at: Between(fromDate, toDate),
+      status: status,
+    };
+    if (!status) {
+      delete objWhere.status;
+    }
+
+    const [result, total] = await this.orderRepo.findAndCount({
+      where: objWhere,
+      relations: [
+        'orderDetail',
+        'orderDetail.product',
+        'orderDetail.product.images',
+      ],
+      order: { created_at: 'DESC' },
+      take: take,
+      skip: skip,
+    });
+
+    return {
+      data: result,
+      count: total,
+    };
   }
+
   async addNew(body, request) {
     if (body?.products) {
       const productArr = JSON.parse(body?.products);
@@ -45,6 +77,7 @@ export class OrderService {
         address: body?.address,
         status: OrderEnum.NEW,
         created_by: request?.user?.username,
+        code: ranDomUID(),
       };
       const newOrder = await this.orderRepo.insert(data);
       const newOrderID = newOrder?.identifiers[0]?.orderID;

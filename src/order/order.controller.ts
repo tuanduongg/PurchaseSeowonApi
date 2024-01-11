@@ -21,12 +21,14 @@ export class OrderController {
     const data = await this.orderService.fake();
     return res.status(HttpStatus.OK).send(data);
   }
+
   @UseGuards(AuthGuard)
-  @Get('/all')
-  async getAll(@Res() res: Response) {
-    const data = await this.orderService.getAll();
+  @Post('/all')
+  async getAll(@Res() res: Response, @Body() body) {
+    const data = await this.orderService.getAll(body);
     return res.status(HttpStatus.OK).send(data);
   }
+
   @UseGuards(AuthGuard)
   @Post('/add')
   async addNewOrder(
