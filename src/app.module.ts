@@ -13,6 +13,7 @@ import { DepartmentModule } from './department/department.module';
 import { OrderModule } from './order/order.module';
 import { FileModule } from './file/file.module';
 import { UnitModule } from './unit/unit.module';
+import { StatusModule } from './status/status.module';
 
 @Module({
   imports: [
@@ -66,6 +67,7 @@ import { UnitModule } from './unit/unit.module';
     FileModule,
     UnitModule,
     ImageModule,
+    StatusModule
   ],
   controllers: [AppController],
   providers: [AppService],

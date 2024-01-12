@@ -24,8 +24,8 @@ export class OrderController {
 
   @UseGuards(AuthGuard)
   @Post('/all')
-  async getAll(@Res() res: Response, @Body() body) {
-    const data = await this.orderService.getAll(body);
+  async getAll(@Res() res: Response, @Req() request: Request, @Body() body) {
+    const data = await this.orderService.getAll(body, request?.user);
     return res.status(HttpStatus.OK).send(data);
   }
 

@@ -7,8 +7,11 @@ import {
   DeleteDateColumn,
   PrimaryGeneratedColumn,
   OneToMany,
+  ManyToOne,
+  JoinColumn,
 } from 'typeorm';
 import { OrderDetail } from './order_detail.entity';
+import { Status } from './status.entity';
 
 @Entity()
 export class Order {
@@ -22,6 +25,9 @@ export class Order {
   userID: string;
 
   @Column({ nullable: true })
+  departmentID: string;
+
+  @Column({ nullable: true })
   total: string;
 
   @Column()
@@ -32,8 +38,14 @@ export class Order {
   @Column()
   note: string;
 
-  @Column()
-  status: string;
+  @Column({ nullable: true })
+  statusID: string;
+
+  @CreateDateColumn({ default: null })
+  cancel_at: Date;
+
+  @Column({ default: null })
+  cancel_by: string;
 
   @CreateDateColumn({ type: 'datetime' })
   created_at: Date;
@@ -55,4 +67,8 @@ export class Order {
 
   @OneToMany(() => OrderDetail, (orderDetail) => orderDetail.order)
   orderDetail: OrderDetail[];
+
+  @ManyToOne(() => Status, (status) => status.orders)
+  @JoinColumn({ name: 'statusID', referencedColumnName: 'statusID' })
+  status: Status;
 }
