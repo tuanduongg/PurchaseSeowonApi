@@ -42,4 +42,19 @@ export class OrderController {
     }
     return res.status(HttpStatus.BAD_REQUEST).send({ message: 'Insert fail!' });
   }
+  @UseGuards(AuthGuard)
+  @Post('/change-status')
+  async changeSatus(
+    @Body() body,
+    @Req() request: Request,
+    @Res() res: Response,
+  ) {
+    const data = await this.orderService.changeStatus(body, request);
+    if (data) {
+      return res.status(HttpStatus.OK).send(data);
+    }
+    return res
+      .status(HttpStatus.BAD_REQUEST)
+      .send({ message: 'Change status fail!' });
+  }
 }

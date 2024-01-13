@@ -4,7 +4,7 @@ import { Order } from 'src/entity/order.entity';
 import { OrderDetail } from 'src/entity/order_detail.entity';
 import { getSubTotal, ranDomUID } from 'src/helper/helper';
 import { StatusService } from 'src/status/status.service';
-import { Between, Like, Repository } from 'typeorm';
+import { Between, Equal, LessThanOrEqual, Like, Repository } from 'typeorm';
 
 @Injectable()
 export class OrderService {
@@ -56,7 +56,7 @@ export class OrderService {
     const objCondition = {
       code: Like('%' + search + '%'),
       created_at: Between(fromDate, toDate),
-      status: { value: status, level: 1 },
+      status: { value: status, level: LessThanOrEqual(1) },
       departmentID: userReq?.departmentID,
       userID: userReq.id,
     };
@@ -64,9 +64,8 @@ export class OrderService {
       delete objCondition.status.value;
     }
     const userStatus = await this.statusService.findByUserID(userReq.id);
-    console.log('userStatus', userStatus);
     if (userStatus) {
-      objCondition.status.level = userStatus?.level - 1;
+      objCondition.status.level = Equal(userStatus?.level - 1);
       objCondition.userID = userReq?.id;
       // co trong danh sach duyet -> lấy những đơn status level người hiện tại - 1
     } else {
@@ -84,7 +83,6 @@ export class OrderService {
       }
     }
     arrWhere.push(objCondition);
-    console.log('arrWhere', arrWhere);
 
     // nếu là staff -> lấy order của người đó
     // nếu manager -> order của người đó + order bộ phận
@@ -138,6 +136,7 @@ export class OrderService {
     return {
       data: result,
       count: total,
+      userStatus,
     };
   }
 
@@ -176,6 +175,32 @@ export class OrderService {
         } catch (error) {
           console.log('error', error);
         }
+      }
+    }
+    return null;
+  }
+  async changeStatus(body, request) {
+    const orderID = body?.orderID;
+    const status = body?.status;
+    if (orderID) {
+      if (status) {
+        const statusNew = await this.statusService.findByLevel(
+          status?.level + 1,
+        );
+        if (statusNew) {
+          const order = await this.orderRepo.update(orderID, {
+            statusID: statusNew.statusID,
+            updated_by: request?.user?.username,
+          });
+          return order;
+        }
+      } else {
+        const order = await this.orderRepo.update(orderID, {
+          statusID: '7d39e061-fbb0-ee11-a1ca-04d9f5c9d2eb',
+          updated_by: request?.user?.username,
+          cancel_by: request?.user?.username,
+        });
+        return order;
       }
     }
     return null;

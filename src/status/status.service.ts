@@ -28,4 +28,7 @@ export class StatusService {
   async findByUserID(userId) {
     return await this.repo.findOne({ where: { userID: userId } });
   }
+  async findByLevel(level) {
+    return await this.repo.findOne({ where: { level } });
+  }
 }
