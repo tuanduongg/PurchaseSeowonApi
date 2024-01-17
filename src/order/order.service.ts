@@ -4,7 +4,14 @@ import { Order } from 'src/entity/order.entity';
 import { OrderDetail } from 'src/entity/order_detail.entity';
 import { getSubTotal, ranDomUID } from 'src/helper/helper';
 import { StatusService } from 'src/status/status.service';
-import { Between, Equal, LessThanOrEqual, Like, Repository } from 'typeorm';
+import {
+  Between,
+  Equal,
+  LessThanOrEqual,
+  Like,
+  MoreThanOrEqual,
+  Repository,
+} from 'typeorm';
 
 @Injectable()
 export class OrderService {
@@ -62,6 +69,13 @@ export class OrderService {
       userID: userReq.id,
     };
 
+    const cancelByWhere = {
+      code: Like('%' + search + '%'),
+      created_at: Between(fromDate, toDate),
+      cancel_by: userReq?.username,
+      // status: { value: status },
+    };
+
     const userStatus = await this.statusService.findByUserID(userReq.id);
 
     const objMyOrder = {
@@ -79,14 +93,16 @@ export class OrderService {
         // status: { value: status },
       };
       arrWhere.push(objIsManagerOrder);
+      arrWhere.push(cancelByWhere);
     }
     if (userStatus) {
       const objApproved = {
         code: Like('%' + search + '%'),
         created_at: Between(fromDate, toDate),
-        status: { level: userStatus.level - 1 },
+        status: { level: MoreThanOrEqual(userStatus.level - 1) },
       };
       arrWhere.push(objApproved);
+      arrWhere.push(cancelByWhere);
     }
     // if (userStatus) {
     //   console.log('userStatus', userStatus);

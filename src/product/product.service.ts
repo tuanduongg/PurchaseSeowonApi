@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Image } from 'src/entity/image.entity';
 import { Product } from 'src/entity/product.entity';
-import { Like, Repository } from 'typeorm';
+import { IsNull, Like, Repository } from 'typeorm';
 
 @Injectable()
 export class ProductService {
@@ -87,16 +87,17 @@ export class ProductService {
     return null;
   }
 
-  // async deleteProduct(body, request) {
-  //   console.log('request', request);
-  //   const productID = body.productID;
-  //   const product = await this.productRepo.findOne({ where: { productID } });
-  //   if (product) {
-  //     product.isShow = !product.isShow;
-  //     return await this.productRepo.save(product);
-  //   }
-  //   return null;
-  // }
+  async deleteProduct(body, request) {
+    // console.log('request', request);
+    const productID = body.productID;
+    const product = await this.productRepo.findOne({ where: { productID } });
+    if (product) {
+      product.deleted_by = request?.user?.username;
+      product.delete_at = new Date();
+      return await this.productRepo.save(product);
+    }
+    return null;
+  }
 
   async getAllIsShow(query, isShowProp?) {
     const take = +query.rowsPerPage || 10;

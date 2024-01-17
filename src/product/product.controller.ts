@@ -39,12 +39,12 @@ export class ProductController {
     return res.status(HttpStatus.OK).send(data);
   }
 
-  // @UseGuards(AuthGuard)
-  // @Post('/delete')
-  // async delete(@Body() body, @Req() request: Request, @Res() res: Response) {
-  //   const data = await this.productService.(body, request);
-  //   return res.status(HttpStatus.OK).send(data);
-  // }
+  @UseGuards(AuthGuard)
+  @Post('/delete')
+  async delete(@Body() body, @Req() request: Request, @Res() res: Response) {
+    const data = await this.productService.deleteProduct(body, request);
+    return res.status(HttpStatus.OK).send(data);
+  }
 
   @UseGuards(AuthGuard)
   @Post('/changePublic')
