@@ -33,6 +33,7 @@ export class OrderService {
   }
   async getAll(query, userReq) {
     // const userReq = {
+    console.log('userReq', userReq);
     //   username: 'admin',
     //   id: '58AC5FB3-08AA-EE11-A1CA-04D9F5C9D2EB',
     //   departmentID: '1370A16B-08AA-EE11-A1CA-04D9F5C9D2EB',
@@ -60,29 +61,78 @@ export class OrderService {
       departmentID: userReq?.departmentID,
       userID: userReq.id,
     };
-    if (!status) {
-      delete objCondition.status.value;
-    }
+
     const userStatus = await this.statusService.findByUserID(userReq.id);
-    if (userStatus) {
-      objCondition.status.level = Equal(userStatus?.level - 1);
-      objCondition.userID = userReq?.id;
-      // co trong danh sach duyet -> lấy những đơn status level người hiện tại - 1
-    } else {
-      if (userReq?.isManager) {
-        // lấy order của chính mk + order của bộ phận
-        // arrWhere.userID = userReq.id;
-        const objectTepm = { ...objCondition };
-        delete objCondition.departmentID;
-        delete objectTepm.userID;
-        arrWhere.push(objectTepm);
-      } else {
-        delete objCondition.departmentID;
-        delete objCondition.status.level;
-        objCondition.userID = userReq?.id;
-      }
+
+    const objMyOrder = {
+      code: Like('%' + search + '%'),
+      created_at: Between(fromDate, toDate),
+      userID: userReq.id,
+      // status: { value: status },
+    };
+    arrWhere.push(objMyOrder);
+    if (userReq?.isManager) {
+      const objIsManagerOrder = {
+        code: Like('%' + search + '%'),
+        created_at: Between(fromDate, toDate),
+        departmentID: userReq?.departmentID,
+        // status: { value: status },
+      };
+      arrWhere.push(objIsManagerOrder);
     }
-    arrWhere.push(objCondition);
+    if (userStatus) {
+      const objApproved = {
+        code: Like('%' + search + '%'),
+        created_at: Between(fromDate, toDate),
+        status: { level: userStatus.level - 1 },
+      };
+      arrWhere.push(objApproved);
+    }
+    // if (userStatus) {
+    //   console.log('userStatus', userStatus);
+    //   // là người duyệt thì lấy đơn level - 1
+    //   const objectTepm2 = { ...objCondition };
+    //   delete objectTepm2.departmentID;
+    //   delete objectTepm2.userID;
+    //   const levelSub = userStatus?.level - 1;
+    //   console.log('level sub', levelSub);
+    //   objectTepm2.status.level = Equal(levelSub);
+    //   arrWhere.push(objectTepm2);
+    //   // ///////////////
+    //   if (userReq?.isManager) {
+    //     //là quản lý thì lấy đơn phòng đó
+    //     const objectTepm = { ...objCondition };
+    //     console.log('isMananger');
+    //     objectTepm.departmentID = userReq?.departmentID;
+    //     delete objectTepm.userID;
+    //     delete objectTepm.status.level;
+    //     arrWhere.push(objectTepm);
+    //   }
+
+    //   // lấy đơn của bản thân
+    //   delete objCondition.status.level;
+    //   objCondition.userID = userReq?.id;
+    //   delete objCondition.departmentID;
+    //   delete objCondition.status.level;
+    // } else {
+    //   if (userReq?.isManager) {
+    //     // lấy order của chính mk + order của bộ phận
+    //     // arrWhere.userID = userReq.id;
+    //     const objectTepm = { ...objCondition };
+    //     delete objCondition.departmentID;
+    //     delete objectTepm.userID;
+    //     arrWhere.push(objectTepm);
+    //   } else {
+    //     delete objCondition.departmentID;
+    //     delete objCondition.status.level;
+    //     objCondition.userID = userReq?.id;
+    //   }
+    // }
+    // if (!status) {
+    //   delete objCondition.status.value;
+    // }
+    // arrWhere.push(objCondition);
+    console.log('arrWhere', arrWhere);
 
     // nếu là staff -> lấy order của người đó
     // nếu manager -> order của người đó + order bộ phận
@@ -102,6 +152,8 @@ export class OrderService {
         note: true,
         created_at: true,
         created_by: true,
+        cancel_at: true,
+        cancel_by: true,
         status: {
           statusID: true,
           statusName: true,
@@ -142,6 +194,18 @@ export class OrderService {
 
   async addNew(body, request) {
     if (body?.products) {
+      const userStatus = await this.statusService.findByUserID(
+        request?.user.id,
+      );
+      let statusID = '';
+      if (userStatus) {
+        statusID = userStatus.statusID;
+      } else {
+        const rs = await this.statusService.findByLevel(
+          request?.user?.isManager ? 2 : 1,
+        );
+        statusID = rs.statusID;
+      }
       const productArr = JSON.parse(body?.products);
       const total = getSubTotal(productArr);
       const data = {
@@ -151,7 +215,7 @@ export class OrderService {
         reciever: body?.reciever,
         note: body?.note,
         address: body?.address,
-        statusID: '0e112e77-f3b0-ee11-a1ca-04d9f5c9d2eb',
+        statusID: statusID,
         created_by: request?.user?.username,
         code: ranDomUID(),
       };
