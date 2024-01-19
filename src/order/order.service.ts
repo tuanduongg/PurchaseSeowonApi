@@ -148,7 +148,6 @@ export class OrderService {
     //   delete objCondition.status.value;
     // }
     // arrWhere.push(objCondition);
-    console.log('arrWhere', arrWhere);
 
     // nếu là staff -> lấy order của người đó
     // nếu manager -> order của người đó + order bộ phận
