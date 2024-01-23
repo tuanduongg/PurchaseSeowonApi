@@ -1,19 +1,44 @@
-import { Controller, Get, HttpStatus, Res } from '@nestjs/common';
-import { Response } from 'express';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpStatus,
+  Post,
+  Req,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
+import { Request, Response } from 'express';
 import { CategoryService } from './deparment.service';
+import { AdminGuard } from 'src/auth/admin.guard';
+import { AuthGuard } from 'src/auth/auth.guard';
 
 @Controller('/department')
 export class DepartmentController {
   constructor(private readonly cateService: CategoryService) {}
-
-  @Get('/fake')
-  async fakeData(@Res() res: Response) {
-    const data = await this.cateService.fake();
-    return res.status(HttpStatus.OK).send(data);
-  }
+  @UseGuards(AdminGuard)
+  @UseGuards(AuthGuard)
   @Get('/all')
   async getAll(@Res() res: Response) {
     const data = await this.cateService.getAll();
     return res.status(HttpStatus.OK).send(data);
+  }
+  @UseGuards(AdminGuard)
+  @UseGuards(AuthGuard)
+  @Post('/add')
+  async add(@Res() res: Response, @Req() request: Request, @Body() body) {
+    const data = await this.cateService.add(body);
+    if (data) {
+      return res.status(HttpStatus.OK).send(data);
+    }
+    return res
+      .status(HttpStatus.BAD_REQUEST)
+      .send({ message: 'Cannot add department' });
+  }
+  @UseGuards(AdminGuard)
+  @UseGuards(AuthGuard)
+  @Post('/update')
+  async update(@Res() res: Response, @Req() request: Request, @Body() body) {
+    return await this.cateService.update(body, res);
   }
 }

@@ -103,7 +103,7 @@ export class UserService {
       }
       checkUsername.isManager = body?.isManager ?? false;
       checkUsername.updated_by = request?.user?.username;
-      const user = await this.userRepo.save(checkUsername);
+      const { password, ...user } = await this.userRepo.save(checkUsername);
       return user;
     }
     return null;

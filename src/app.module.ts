@@ -67,7 +67,7 @@ import { StatusModule } from './status/status.module';
     FileModule,
     UnitModule,
     ImageModule,
-    StatusModule
+    StatusModule,
   ],
   controllers: [AppController],
   providers: [AppService],

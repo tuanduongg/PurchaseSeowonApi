@@ -9,10 +9,13 @@ async function bootstrap() {
   app.setGlobalPrefix('api');
   // app.useStaticAssets(join(__dirname, '..', 'public'));
   app.useStaticAssets(join(__dirname, '..', 'public').replace('\\dist', ''));
-  console.log('join', join(__dirname, '..', 'public'));
   const configService = app.get(ConfigService);
   const port = configService.get('PORT') || 8000;
-  app.enableCors();
+
+    app.enableCors({
+        allowedHeaders:"*",
+        origin: "*"
+    });
   await app.listen(port);
 }
 bootstrap();

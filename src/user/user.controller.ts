@@ -11,6 +11,7 @@ import {
 import { UserService } from './user.service';
 import { Request, Response } from 'express';
 import { AuthGuard } from 'src/auth/auth.guard';
+import { AdminGuard } from 'src/auth/admin.guard';
 
 @Controller('/user')
 export class UserController {
@@ -20,11 +21,8 @@ export class UserController {
   getHello(): string {
     return this.userService.getHello();
   }
-  @Get('/fake')
-  fake() {
-    return this.userService.fake();
-  }
 
+  @UseGuards(AdminGuard)
   @UseGuards(AuthGuard)
   @Post('/all')
   async getAll(@Body() body, @Req() request: Request, @Res() res: Response) {
@@ -37,6 +35,7 @@ export class UserController {
       .send({ message: 'Get data fail!' });
   }
 
+  @UseGuards(AdminGuard)
   @UseGuards(AuthGuard)
   @Post('/add')
   async add(@Body() body, @Req() request: Request, @Res() res: Response) {
@@ -51,6 +50,7 @@ export class UserController {
     return res.status(HttpStatus.BAD_REQUEST).send({ message: 'Insert fail!' });
   }
 
+  @UseGuards(AdminGuard)
   @UseGuards(AuthGuard)
   @Post('/edit')
   async edit(@Body() body, @Req() request: Request, @Res() res: Response) {
@@ -63,6 +63,7 @@ export class UserController {
     return res.status(HttpStatus.BAD_REQUEST).send({ message: 'Update fail!' });
   }
 
+  @UseGuards(AdminGuard)
   @UseGuards(AuthGuard)
   @Get('/info')
   getUser(@Req() request: Request) {

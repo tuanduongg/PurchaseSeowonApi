@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Department } from 'src/entity/department.entity';
 import { Repository } from 'typeorm';
@@ -21,5 +21,30 @@ export class CategoryService {
   }
   async getAll() {
     return await this.departRepo.find({});
+  }
+  async add(body) {
+    if (body?.departName) {
+      const rs = await this.departRepo.insert({ departName: body.departName });
+      return rs;
+    }
+    return null;
+  }
+  async update(body, res) {
+    if (body?.departID) {
+      const department = await this.departRepo.findOne({
+        where: { departID: body?.departID },
+      });
+      if (department) {
+        department.departName = body?.departName;
+        const result = await this.departRepo.save(department);
+        return res.status(HttpStatus.OK).send(result);
+      }
+      return res
+        .status(HttpStatus.BAD_REQUEST)
+        .send({ message: 'Cannot found!' });
+    }
+    return res
+      .status(HttpStatus.BAD_REQUEST)
+      .send({ message: 'Cannot update department!' });
   }
 }

@@ -18,6 +18,7 @@ export class AuthService {
         departmentID: user.departmentID,
         isManager: user.isManager,
         email: user.email,
+        isApprover: user.isApprover,
       };
       return {
         user: payload,

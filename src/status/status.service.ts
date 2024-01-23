@@ -20,7 +20,7 @@ export class StatusService {
   //   ]);
   // }
   async getAll() {
-    return await this.repo.find({});
+    return await this.repo.find({ order: { level: 'ASC' } });
   }
   async findByID(id) {
     return await this.repo.findOneOrFail({ where: { statusID: id } });

@@ -15,13 +15,6 @@ import { AuthGuard } from 'src/auth/auth.guard';
 @Controller('/order')
 export class OrderController {
   constructor(private readonly orderService: OrderService) {}
-
-  @Get('/fake')
-  async fakeData(@Res() res: Response) {
-    const data = await this.orderService.fake();
-    return res.status(HttpStatus.OK).send(data);
-  }
-
   @UseGuards(AuthGuard)
   @Post('/all')
   async getAll(@Res() res: Response, @Req() request: Request, @Body() body) {

@@ -22,25 +22,8 @@ export class OrderService {
     private orderDetailRepo: Repository<OrderDetail>,
     private readonly statusService: StatusService,
   ) {}
-
-  async fake() {
-    return this.orderRepo.insert([
-      {
-        total: `12000`,
-        address: 'B2',
-        reciever: 'Kho b2',
-        // status: OrderEnum.NEW,
-        userID: '',
-      },
-      // {
-      //   productID: 'db025e2f-09aa-ee11-a1ca-04d9f5c9d2eb',
-      //   url: '/image2.jpg',
-      // },
-    ]);
-  }
   async getAll(query, userReq) {
     // const userReq = {
-    console.log('userReq', userReq);
     //   username: 'admin',
     //   id: '58AC5FB3-08AA-EE11-A1CA-04D9F5C9D2EB',
     //   departmentID: '1370A16B-08AA-EE11-A1CA-04D9F5C9D2EB',
@@ -61,13 +44,6 @@ export class OrderService {
     //   status: status,
     // };
     const arrWhere = [];
-    const objCondition = {
-      code: Like('%' + search + '%'),
-      created_at: Between(fromDate, toDate),
-      status: { value: status, level: LessThanOrEqual(1) },
-      departmentID: userReq?.departmentID,
-      userID: userReq.id,
-    };
 
     const cancelByWhere = {
       code: Like('%' + search + '%'),
@@ -104,56 +80,6 @@ export class OrderService {
       arrWhere.push(objApproved);
       arrWhere.push(cancelByWhere);
     }
-    // if (userStatus) {
-    //   console.log('userStatus', userStatus);
-    //   // là người duyệt thì lấy đơn level - 1
-    //   const objectTepm2 = { ...objCondition };
-    //   delete objectTepm2.departmentID;
-    //   delete objectTepm2.userID;
-    //   const levelSub = userStatus?.level - 1;
-    //   console.log('level sub', levelSub);
-    //   objectTepm2.status.level = Equal(levelSub);
-    //   arrWhere.push(objectTepm2);
-    //   // ///////////////
-    //   if (userReq?.isManager) {
-    //     //là quản lý thì lấy đơn phòng đó
-    //     const objectTepm = { ...objCondition };
-    //     console.log('isMananger');
-    //     objectTepm.departmentID = userReq?.departmentID;
-    //     delete objectTepm.userID;
-    //     delete objectTepm.status.level;
-    //     arrWhere.push(objectTepm);
-    //   }
-
-    //   // lấy đơn của bản thân
-    //   delete objCondition.status.level;
-    //   objCondition.userID = userReq?.id;
-    //   delete objCondition.departmentID;
-    //   delete objCondition.status.level;
-    // } else {
-    //   if (userReq?.isManager) {
-    //     // lấy order của chính mk + order của bộ phận
-    //     // arrWhere.userID = userReq.id;
-    //     const objectTepm = { ...objCondition };
-    //     delete objCondition.departmentID;
-    //     delete objectTepm.userID;
-    //     arrWhere.push(objectTepm);
-    //   } else {
-    //     delete objCondition.departmentID;
-    //     delete objCondition.status.level;
-    //     objCondition.userID = userReq?.id;
-    //   }
-    // }
-    // if (!status) {
-    //   delete objCondition.status.value;
-    // }
-    // arrWhere.push(objCondition);
-
-    // nếu là staff -> lấy order của người đó
-    // nếu manager -> order của người đó + order bộ phận
-    // người duyệt 1 -> lấy order level trừ 1
-    // ....
-    // mrstỉnh lấy
 
     const [result, total] = await this.orderRepo.findAndCount({
       select: {
@@ -209,18 +135,33 @@ export class OrderService {
 
   async addNew(body, request) {
     if (body?.products) {
+      // const userStatus = await this.statusService.findByUserID(
+      //   request?.user.id,
+      // );
+      // let statusID = '';
+      // if (userStatus && request?.user?.isManager) {
+      //   //neu la nguoi duyet , và người duyệt là quản lý bộ phận
+      //   statusID = userStatus.statusID; //gan status la ng do
+      // } else {
+      //   const rs = await this.statusService.findByLevel(
+      //     request?.user?.isManager ? 2 : 1,
+      //   );
+      //   statusID = rs.statusID;
+      // }
       const userStatus = await this.statusService.findByUserID(
         request?.user.id,
-      );
+      ); //check user có phải người duyệt
       let statusID = '';
-      if (userStatus) {
-        statusID = userStatus.statusID;
+      if (userStatus && request?.user?.isManager) {
+        //neu la nguoi duyet , và người duyệt là quản lý bộ phận
+        statusID = userStatus.statusID; //gan status la ng do
       } else {
         const rs = await this.statusService.findByLevel(
           request?.user?.isManager ? 2 : 1,
-        );
+        ); // lấy ra ID tiếp thôi
         statusID = rs.statusID;
       }
+
       const productArr = JSON.parse(body?.products);
       const total = getSubTotal(productArr);
       const data = {
@@ -262,7 +203,9 @@ export class OrderService {
     const orderID = body?.orderID;
     const status = body?.status;
     if (orderID) {
+      //mr tinh len don -> mrSong -> mr
       if (status) {
+        //nếu chuyền lên status,
         const statusNew = await this.statusService.findByLevel(
           status?.level + 1,
         );
@@ -274,10 +217,13 @@ export class OrderService {
           return order;
         }
       } else {
+        //truwongf hopw cancel
+        const statusCancel = await this.statusService.findByLevel(0);
         const order = await this.orderRepo.update(orderID, {
-          statusID: '7d39e061-fbb0-ee11-a1ca-04d9f5c9d2eb',
+          statusID: statusCancel.statusID,
           updated_by: request?.user?.username,
           cancel_by: request?.user?.username,
+          cancel_at: new Date(),
         });
         return order;
       }

@@ -41,7 +41,7 @@ export class Order {
   @Column({ nullable: true })
   statusID: string;
 
-  @CreateDateColumn({ default: null })
+  @Column({ default: null })
   cancel_at: Date;
 
   @Column({ default: null })
