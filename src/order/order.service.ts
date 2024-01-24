@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Order } from 'src/entity/order.entity';
 import { OrderDetail } from 'src/entity/order_detail.entity';
 import { getSubTotal, ranDomUID } from 'src/helper/helper';
+import { ProductService } from 'src/product/product.service';
 import { StatusService } from 'src/status/status.service';
 import {
   Between,
@@ -21,6 +22,7 @@ export class OrderService {
     @InjectRepository(OrderDetail)
     private orderDetailRepo: Repository<OrderDetail>,
     private readonly statusService: StatusService,
+    private readonly productService: ProductService,
   ) {}
   async getAll(query, userReq) {
     // const userReq = {
@@ -179,7 +181,12 @@ export class OrderService {
       const newOrderID = newOrder?.identifiers[0]?.orderID;
       if (newOrderID) {
         const arrDetailUpdate = [];
+        const arrProductNew = [];
         productArr.map((item) => {
+          arrProductNew.push({
+            productID: item?.productID,
+            inventory: parseInt(item?.inventory) - parseInt(item?.quantity),
+          });
           arrDetailUpdate.push({
             orderID: newOrderID,
             productID: item?.productID,
@@ -191,7 +198,9 @@ export class OrderService {
         try {
           const dataInserted =
             await this.orderDetailRepo.insert(arrDetailUpdate);
-          return { dataInserted, newOrder };
+          const dataProductChange =
+            await this.productService.changeInventory(arrProductNew);
+          return { dataInserted, newOrder, dataProductChange };
         } catch (error) {
           console.log('error', error);
         }

@@ -6,6 +6,7 @@ import {
   Post,
   Req,
   Res,
+  UploadedFile,
   UploadedFiles,
   UseGuards,
   UseInterceptors,
@@ -13,7 +14,7 @@ import {
 import { ProductService } from './product.service';
 import { Response, Request } from 'express';
 import { AuthGuard } from 'src/auth/auth.guard';
-import { FilesInterceptor } from '@nestjs/platform-express';
+import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { multerConfig } from 'src/config/multer.config';
 import { AdminGuard } from 'src/auth/admin.guard';
 
@@ -117,5 +118,20 @@ export class ProductController {
     return res
       .status(HttpStatus.BAD_REQUEST)
       .send({ message: 'Cannot edit product!' });
+  }
+  @UseGuards(AdminGuard)
+  @UseGuards(AuthGuard)
+  @Post('/uploadExcel')
+  @UseInterceptors(FileInterceptor('file'))
+  async uploadExcel(
+    @Body() body,
+    @Req() request: Request,
+    @Res() res: Response,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    console.log('file', file);
+    const data = await this.productService.uploadExcel(body, file, request);
+    console.log('data', data);
+
   }
 }

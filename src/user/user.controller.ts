@@ -69,4 +69,9 @@ export class UserController {
   getUser(@Req() request: Request) {
     return this.userService.getUser(request);
   }
+
+  @Get('/test')
+  test(@Req() request: Request) {
+    return this.userService.test();
+  }
 }

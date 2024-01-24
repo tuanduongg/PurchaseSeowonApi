@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Image } from 'src/entity/image.entity';
 import { Product } from 'src/entity/product.entity';
 import { IsNull, Like, Repository } from 'typeorm';
+const ExcelJS = require('exceljs');
 
 @Injectable()
 export class ProductService {
@@ -132,5 +133,22 @@ export class ProductService {
       data: result,
       count: total,
     };
+  }
+  async changeInventory(products) {
+    if (products) {
+      const data = await this.productRepo.save(products);
+      return data;
+    }
+    return null;
+  }
+  async uploadExcel(body, file, request) {
+    const workbook = new ExcelJS.Workbook();
+    await workbook.xlsx.load(file.buffer);
+    console.log('workbook', workbook);
+    workbook.eachSheet((sheet, id) => {
+      sheet.eachRow((row, rowIndex) => {
+        console.log(row.values);
+      });
+    });
   }
 }

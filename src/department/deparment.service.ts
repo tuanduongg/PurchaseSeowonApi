@@ -4,7 +4,7 @@ import { Department } from 'src/entity/department.entity';
 import { Repository } from 'typeorm';
 
 @Injectable()
-export class CategoryService {
+export class DepartmentService {
   constructor(
     @InjectRepository(Department)
     private departRepo: Repository<Department>,

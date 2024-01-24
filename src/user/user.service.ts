@@ -117,4 +117,11 @@ export class UserService {
     });
     return user;
   }
+  async test() {
+    const user = await this.userRepo.save({
+      userID: '8CCF9405-FAB8-EE11-A1CA-04D9F5C9D2EB',
+      isApprover: true,
+    });
+    return user;
+  }
 }
