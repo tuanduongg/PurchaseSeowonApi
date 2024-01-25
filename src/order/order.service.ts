@@ -198,9 +198,9 @@ export class OrderService {
         try {
           const dataInserted =
             await this.orderDetailRepo.insert(arrDetailUpdate);
-          const dataProductChange =
-            await this.productService.changeInventory(arrProductNew);
-          return { dataInserted, newOrder, dataProductChange };
+          // const dataProductChange =
+          //   await this.productService.changeInventory(arrProductNew);
+          return { dataInserted, newOrder };
         } catch (error) {
           console.log('error', error);
         }
@@ -215,12 +215,28 @@ export class OrderService {
       //mr tinh len don -> mrSong -> mr
       if (status) {
         //nếu chuyền lên status,
-        const statusNew = await this.statusService.findByLevel(
-          status?.level + 1,
-        );
-        if (statusNew) {
+        const statusCont = status?.level + 1;
+        const statusNew =
+          await this.statusService.findByLevelWithMax(statusCont);
+        if (statusNew?.max?.level === statusCont) {
+          const orderDetails = await this.orderDetailRepo.find({
+            where: { orderID: orderID },
+          });
+          if (orderDetails?.length > 0) {
+            const dataUpdate = orderDetails.map((item) => {
+              return {
+                productID: item.productID,
+                quantity: item.quantity,
+              };
+            });
+            console.log('dataUpdate', dataUpdate);
+            const updateProducts =
+              await this.productService.updateInventory(dataUpdate);
+          }
+        }
+        if (statusNew?.find) {
           const order = await this.orderRepo.update(orderID, {
-            statusID: statusNew.statusID,
+            statusID: statusNew?.find.statusID,
             updated_by: request?.user?.username,
           });
           return order;

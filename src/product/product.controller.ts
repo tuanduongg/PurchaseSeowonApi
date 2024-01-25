@@ -22,7 +22,7 @@ import { AdminGuard } from 'src/auth/admin.guard';
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
 
-  @UseGuards(AdminGuard)
+  // @UseGuards(AdminGuard)
   @UseGuards(AuthGuard)
   @Post('/public')
   async getAllIsShow(
@@ -130,7 +130,8 @@ export class ProductController {
     @UploadedFile() file: Express.Multer.File,
   ) {
     console.log('file', file);
-    const data = await this.productService.uploadExcel(body, file, request);
+    const data = await this.productService.uploadExcel(body, file, request,res);
+    return data;
     console.log('data', data);
 
   }

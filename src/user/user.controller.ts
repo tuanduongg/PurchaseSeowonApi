@@ -63,7 +63,7 @@ export class UserController {
     return res.status(HttpStatus.BAD_REQUEST).send({ message: 'Update fail!' });
   }
 
-  @UseGuards(AdminGuard)
+  // @UseGuards(AdminGuard)
   @UseGuards(AuthGuard)
   @Get('/info')
   getUser(@Req() request: Request) {

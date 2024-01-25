@@ -13,4 +13,9 @@ export class StatusController {
     const data = await this.cateService.getAll();
     return res.status(HttpStatus.OK).send(data);
   }
+  @Get('/allMax')
+  async getAllWithMax(@Res() res: Response) {
+    const data = await this.cateService.findByLevelWithMax(2);
+    return res.status(HttpStatus.OK).send(data);
+  }
 }

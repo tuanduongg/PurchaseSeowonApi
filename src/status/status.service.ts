@@ -31,4 +31,16 @@ export class StatusService {
   async findByLevel(level) {
     return await this.repo.findOne({ where: { level } });
   }
+  async findByLevelWithMax(level) {
+    const data = await this.repo.find({ order: { level: 'DESC' } });
+    const result = {
+      find: null,
+      max: null,
+    };
+    if (data?.length > 0) {
+      result.find = data.find((item) => item.level === level);
+      result.max = data[0];
+    }
+    return result;
+  }
 }
