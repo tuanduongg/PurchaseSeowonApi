@@ -2,6 +2,7 @@ import { HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Image } from 'src/entity/image.entity';
 import { Product } from 'src/entity/product.entity';
+import { checkISObject } from 'src/helper/helper';
 import { In, IsNull, Like, Repository } from 'typeorm';
 const ExcelJS = require('exceljs');
 import { getRepository } from 'typeorm';
@@ -219,15 +220,44 @@ export class ProductService {
   // ],
   // ]
   async uploadExcel(body, file, request, res) {
+    const arrLength = [13, 10, 16];
     const workbook = new ExcelJS.Workbook();
     await workbook.xlsx.load(file.buffer);
     const data = [];
+    let error = '';
     workbook.eachSheet((sheet, id) => {
       sheet.eachRow((row, rowIndex) => {
-        data.push(row.values);
-        console.log(`rowIndex at ${rowIndex}`, row.values);
+        // if (arrLength.includes(row?.values?.length)) {
+        // const value = row.values;
+        // //   const cell1 = row.getCell(1).value;
+        // //   console.log('cell 1', cell1);
+        // //   console.log('typeof cell 1', typeof cell1);
+        // //   console.log('typeof ', typeof value);
+        // console.log('value[4]', value[4]);
+        // console.log('value[7]', value[7]);
+        // console.log('value[4] 2', value.getCell(4));
+        // console.log('value[7] 2', value.getCell(7));
+        //   if (!checkISObject(value[4])) {
+        //     error = `Error at ${rowIndex + 1} STT ${value[1]} colum 4`;
+        //     return;
+        //   }
+        //   if (!checkISObject(value[6])) {
+        //     error = `Error at STT ${value[1]} colum 6`;
+        //     return;
+        //   }
+        //   data.push(row.values);
+
+        //   console.log(`leng ${row?.values.length} at ${rowIndex}`, row.values);
+        // }
+        console.log(`leng ${row?.values.length} at ${rowIndex}`, row.values);
       });
+      if (error !== '') {
+        return;
+      }
     });
+    if (error !== '') {
+      return res.status(HttpStatus.BAD_REQUEST).send({ message: error });
+    }
     return res.status(HttpStatus.OK).send(data);
   }
 

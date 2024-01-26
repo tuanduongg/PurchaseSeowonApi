@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { DepartmentService } from 'src/department/deparment.service';
 import { Order } from 'src/entity/order.entity';
 import { OrderDetail } from 'src/entity/order_detail.entity';
 import { getSubTotal, ranDomUID } from 'src/helper/helper';
@@ -8,9 +9,11 @@ import { StatusService } from 'src/status/status.service';
 import {
   Between,
   Equal,
+  In,
   LessThanOrEqual,
   Like,
   MoreThanOrEqual,
+  Not,
   Repository,
 } from 'typeorm';
 
@@ -23,6 +26,7 @@ export class OrderService {
     private orderDetailRepo: Repository<OrderDetail>,
     private readonly statusService: StatusService,
     private readonly productService: ProductService,
+    private readonly departService: DepartmentService,
   ) {}
   async getAll(query, userReq) {
     // const userReq = {
@@ -78,7 +82,22 @@ export class OrderService {
         code: Like('%' + search + '%'),
         created_at: Between(fromDate, toDate),
         status: { level: MoreThanOrEqual(userStatus.level - 1) },
+        departmentID: Not(In([])),
       };
+      if (userStatus?.level === 3) {
+        const dataDeparts = await this.departService.findByCode([
+          'rd',
+          'pp',
+          'sale',
+          'it',
+          'hr',
+        ]);
+        let dataIdDeparts = [];
+        if (dataDeparts?.length > 0) {
+          dataIdDeparts = dataDeparts.map((item) => item?.departID);
+          objApproved.departmentID = Not(In(dataIdDeparts));
+        }
+      }
       arrWhere.push(objApproved);
       arrWhere.push(cancelByWhere);
     }
@@ -158,9 +177,28 @@ export class OrderService {
         //neu la nguoi duyet , và người duyệt là quản lý bộ phận
         statusID = userStatus.statusID; //gan status la ng do
       } else {
-        const rs = await this.statusService.findByLevel(
-          request?.user?.isManager ? 2 : 1,
-        ); // lấy ra ID tiếp thôi
+        let statusUpdate = request?.user?.isManager ? 2 : 1;
+        const dataDeparts = await this.departService.findByCode([
+          'rd',
+          'pp',
+          'sale',
+          'it',
+          'hr',
+        ]);
+        // let levelUpdate = request?.user?.isManager ? 2 : 1;
+        let dataIdDeparts = [];
+        if (dataDeparts?.length > 0) {
+          dataIdDeparts = dataDeparts.map((item) => item?.departID);
+        }
+        if (
+          dataIdDeparts.includes(request?.user?.departmentID) &&
+          request?.user?.isManager
+        ) {
+          // neu nguoi phong it, rd,sale... -> seeps song
+          // levelUpdate = levelUpdate + 1;
+          statusUpdate = statusUpdate + 1;
+        }
+        const rs = await this.statusService.findByLevel(statusUpdate); // lấy ra ID tiếp thôi
         statusID = rs.statusID;
       }
 
@@ -208,14 +246,52 @@ export class OrderService {
     }
     return null;
   }
+  // 1270a16b-08aa-ee11-a1ca-04d9f5c9d2eb	Assy	assy
+  // 1370a16b-08aa-ee11-a1ca-04d9f5c9d2eb	인사/회계/전산(Per/Acc/IT)	it
+  // 1470a16b-08aa-ee11-a1ca-04d9f5c9d2eb	QC	qc
+  // 1570a16b-08aa-ee11-a1ca-04d9f5c9d2eb	Rubber	rb
+  // 1670a16b-08aa-ee11-a1ca-04d9f5c9d2eb	Injection	inj
+  // a6e750de-f5b0-ee11-a1ca-04d9f5c9d2eb	Mold	mold
+  // 8b15aae4-e0b8-ee11-a1ca-04d9f5c9d2eb	Spray	spray
+  // bbb10430-f8b8-ee11-a1ca-04d9f5c9d2eb	HR	hr
+  // b129f30c-ffbb-ee11-a1cb-b5b416639ec5	R&D	rd
+  // b229f30c-ffbb-ee11-a1cb-b5b416639ec5	PP	pp
+  // 890a051a-ffbb-ee11-a1cb-b5b416639ec5	Sale	sale
+  // truong hop: khong co acc quan ly
   async changeStatus(body, request) {
     const orderID = body?.orderID;
     const status = body?.status;
+    const departmentID = body?.departmentID;
     if (orderID) {
       //mr tinh len don -> mrSong -> mr
       if (status) {
+        const userStatus = await this.statusService.findByUserID(
+          request?.user.id,
+        );
+        let statusCont = status?.level + 1;
+        if (
+          userStatus &&
+          request?.user?.isManager &&
+          departmentID === request?.user?.departmentID
+        ) {
+          // truong hop la quan ly + nguoi duyet
+          statusCont = userStatus?.level;
+        }
+        const dataDeparts = await this.departService.findByCode([
+          'rd',
+          'pp',
+          'sale',
+          'it',
+          'hr',
+        ]);
+        let dataIdDeparts = [];
+        if (dataDeparts?.length > 0) {
+          dataIdDeparts = dataDeparts.map((item) => item?.departID);
+        }
+        if (dataIdDeparts.includes(departmentID) && statusCont === 2) {
+          statusCont = statusCont + 1;
+        }
         //nếu chuyền lên status,
-        const statusCont = status?.level + 1;
         const statusNew =
           await this.statusService.findByLevelWithMax(statusCont);
         if (statusNew?.max?.level === statusCont) {
@@ -229,7 +305,6 @@ export class OrderService {
                 quantity: item.quantity,
               };
             });
-            console.log('dataUpdate', dataUpdate);
             const updateProducts =
               await this.productService.updateInventory(dataUpdate);
           }

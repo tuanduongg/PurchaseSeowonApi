@@ -9,7 +9,9 @@ export class Department {
 
   @Column()
   departName: string;
-  
+  @Column({nullable: true })
+  departCode: string;
+
   @OneToMany(() => User, (user) => user.department)
   users: User[];
 }

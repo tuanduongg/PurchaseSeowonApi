@@ -1,7 +1,7 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Department } from 'src/entity/department.entity';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 
 @Injectable()
 export class DepartmentService {
@@ -46,5 +46,12 @@ export class DepartmentService {
     return res
       .status(HttpStatus.BAD_REQUEST)
       .send({ message: 'Cannot update department!' });
+  }
+
+  async findByCode(arrCode) {
+    const data = await this.departRepo.find({
+      where: { departCode: In(arrCode) },
+    });
+    return data;
   }
 }

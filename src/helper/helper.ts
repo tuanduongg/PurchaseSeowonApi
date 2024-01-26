@@ -27,3 +27,7 @@ export const generateCodeOrder = () => {
 export const ranDomUID = () => {
   return 'OD-' + new Date().getTime();
 };
+
+export const checkISObject = (yourVariable) => {
+  return typeof yourVariable === 'object' && yourVariable !== null;
+};

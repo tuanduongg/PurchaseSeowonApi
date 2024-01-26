@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Status } from 'src/entity/status.entity';
-import { Repository } from 'typeorm';
+import { MoreThanOrEqual, Repository } from 'typeorm';
 
 @Injectable()
 export class StatusService {
@@ -43,4 +43,11 @@ export class StatusService {
     }
     return result;
   }
+  // async getDepartIDAcceptor() {
+  //   const data = await this.repo.find({
+  //     where: { level: MoreThanOrEqual(3) },
+  //     relations: ['user'],
+  //   });
+  //   return result;
+  // }
 }
