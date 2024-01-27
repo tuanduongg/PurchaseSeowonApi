@@ -14,9 +14,7 @@ export class ProductService {
     private readonly productRepo: Repository<Product>,
     @InjectRepository(Image)
     private readonly imageRepo: Repository<Image>,
-  ) {
-    const productRepository = getRepository(Product);
-  }
+  ) {}
 
   async changePublic(body) {
     const productID = body.productID;
@@ -146,119 +144,86 @@ export class ProductService {
     return null;
   }
 
-  //   [
-  //     null,
-  //     151,
-  //     "Ổ đôi 3 chấu có màn che, Bắt Vít - WEV1582-7SW",
-  //     "Cái",
-  //     {
-  //         "formula": "VLOOKUP(C8,$K$9:$L$38,2,FALSE)",
-  //         "result": "b4cf7b6e-c3ae-ee11-a1ca-04d9f5c9d2eb"
-  //     },
-  //     60000,
-  //     "Văn phòng phẩm",
-  //     {
-  //         "formula": "VLOOKUP(F8,$N$9:$O$12,2,FALSE)",
-  //         "result": "688e8c27-09aa-ee11-a1ca-04d9f5c9d2eb"
-  //     },
-  //     56,
-  //     "Note ne",
-  //     null,
-  //     "ID đơn vị tính",
-  //     "ID đơn vị tính",
-  //     null,
-  //     "ID danh mục",
-  //     "ID danh mục"
-  // ],
-  // [
-  //     null,
-  //     152,
-  //     "Ốc lục giác",
-  //     "Cái",
-  //     {
-  //         "formula": "VLOOKUP(C9,$K$9:$L$38,2,FALSE)",
-  //         "result": "b4cf7b6e-c3ae-ee11-a1ca-04d9f5c9d2eb"
-  //     },
-  //     4500,
-  //     "Văn phòng phẩm",
-  //     {
-  //         "formula": "VLOOKUP(F9,$N$9:$O$12,2,FALSE)",
-  //         "result": "688e8c27-09aa-ee11-a1ca-04d9f5c9d2eb"
-  //     },
-  //     25,
-  //     "Note ne",
-  //     null,
-  //     "Tên",
-  //     "ID",
-  //     null,
-  //     "Tên",
-  //     "ID"
-  // ],
-  // [
-  //     null,
-  //     153,
-  //     "Ống 3*4",
-  //     "Mét",
-  //     {
-  //         "formula": "VLOOKUP(C10,$K$9:$L$38,2,FALSE)",
-  //         "result": "856026b4-c3ae-ee11-a1ca-04d9f5c9d2eb"
-  //     },
-  //     185000,
-  //     "Văn phòng phẩm",
-  //     {
-  //         "formula": "VLOOKUP(F10,$N$9:$O$12,2,FALSE)",
-  //         "result": "688e8c27-09aa-ee11-a1ca-04d9f5c9d2eb"
-  //     },
-  //     55,
-  //     "Note ne",
-  //     null,
-  //     "Bộ",
-  //     "59381467-c3ae-ee11-a1ca-04d9f5c9d2eb",
-  //     null,
-  //     "Văn phòng phẩm",
-  //     "688e8c27-09aa-ee11-a1ca-04d9f5c9d2eb"
-  // ],
-  // ]
   async uploadExcel(body, file, request, res) {
     const arrLength = [13, 10, 16];
     const workbook = new ExcelJS.Workbook();
     await workbook.xlsx.load(file.buffer);
-    const data = [];
-    let error = '';
+    let textErr = '';
+    const arrProduct = [];
     workbook.eachSheet((sheet, id) => {
       sheet.eachRow((row, rowIndex) => {
-        // if (arrLength.includes(row?.values?.length)) {
-        // const value = row.values;
-        // //   const cell1 = row.getCell(1).value;
-        // //   console.log('cell 1', cell1);
-        // //   console.log('typeof cell 1', typeof cell1);
-        // //   console.log('typeof ', typeof value);
-        // console.log('value[4]', value[4]);
-        // console.log('value[7]', value[7]);
-        // console.log('value[4] 2', value.getCell(4));
-        // console.log('value[7] 2', value.getCell(7));
-        //   if (!checkISObject(value[4])) {
-        //     error = `Error at ${rowIndex + 1} STT ${value[1]} colum 4`;
-        //     return;
-        //   }
-        //   if (!checkISObject(value[6])) {
-        //     error = `Error at STT ${value[1]} colum 6`;
-        //     return;
-        //   }
-        //   data.push(row.values);
+        const valueCol1 = row?.getCell(1)?.value;
+        if (arrLength.includes(row?.values?.length) && valueCol1) {
+          if (typeof valueCol1 !== 'string') {
+            const value2 = row.getCell(2).value; //name
+            const value5 = row.getCell(5).value; //price
+            const value9 = row.getCell(9).value; //note
+            const value4 = row.getCell(4).value; //unit
+            const value7 = row.getCell(7).value; //danh muc
+            const value8 = row.getCell(8).value; //ton kho
 
-        //   console.log(`leng ${row?.values.length} at ${rowIndex}`, row.values);
-        // }
-        console.log(`leng ${row?.values.length} at ${rowIndex}`, row.values);
+            let unitID = '',
+              categoryID = '',
+              inventory = 0;
+
+            if (value8 && typeof value8 === 'number') {
+              inventory = value8;
+            } else {
+              textErr = `Error at ${rowIndex + 1}: invalid value colum 8`;
+              return;
+            }
+            switch (typeof value4) {
+              case 'string':
+                unitID = value4;
+                break;
+              case 'object':
+                unitID = value4?.result;
+                break;
+
+              default:
+                textErr = `Error at ${rowIndex + 1}: invalid value colum 4`;
+                return;
+            }
+            switch (typeof value7) {
+              case 'string':
+                categoryID = value7;
+                break;
+              case 'object':
+                categoryID = value7?.result;
+                break;
+
+              default:
+                textErr = `Error at ${rowIndex + 1}: invalid value colum 7`;
+                return;
+            }
+            arrProduct.push({
+              productName: value2,
+              price: `${value5}`,
+              inventory: inventory,
+              description: `${value9}`,
+              categoryID: categoryID,
+              unitID: unitID,
+              created_by: request?.user?.username,
+              isShow: true,
+            });
+          }
+        }
       });
-      if (error !== '') {
+      if (textErr !== '') {
         return;
       }
     });
-    if (error !== '') {
-      return res.status(HttpStatus.BAD_REQUEST).send({ message: error });
+    if (textErr !== '') {
+      return res.status(HttpStatus.BAD_REQUEST).send({ message: textErr });
     }
-    return res.status(HttpStatus.OK).send(data);
+    try {
+      const dataUpdate = await this.productRepo.insert(arrProduct);
+      return res.status(HttpStatus.OK).send(dataUpdate);
+    } catch (error) {
+      return res
+        .status(HttpStatus.BAD_REQUEST)
+        .send({ message: 'Insert fail!' });
+    }
   }
 
   // const productRepository = getRepository(Product);
