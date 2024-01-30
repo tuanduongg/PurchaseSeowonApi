@@ -40,14 +40,14 @@ export class UserController {
   @Post('/add')
   async add(@Body() body, @Req() request: Request, @Res() res: Response) {
     const data = await this.userService.add(body, request);
-    if (data) {
-      console.log('data', data);
-      if (data == 'Username already exists') {
-        return res.status(HttpStatus.BAD_REQUEST).send({ message: data });
-      }
-      return res.status(HttpStatus.OK).send(data);
+    console.log('data', data);
+    // if (data) {
+    if (data == 'Username already exists') {
+      return res.status(HttpStatus.BAD_REQUEST).send({ message: data });
     }
-    return res.status(HttpStatus.BAD_REQUEST).send({ message: 'Insert fail!' });
+    return res.status(HttpStatus.OK).send(data);
+    // }
+    // return res.status(HttpStatus.BAD_REQUEST).send({ message: 'Insert fail!' });
   }
 
   @UseGuards(AdminGuard)

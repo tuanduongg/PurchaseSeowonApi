@@ -29,7 +29,7 @@ export class Product {
   @Column({ default: 0 })
   inventory: number;
 
-  @Column({ type: 'nvarchar', length: 'MAX', nullable: true })
+  @Column({ type: 'nvarchar', nullable: true })
   description: string;
 
   @Column({ nullable: true })
