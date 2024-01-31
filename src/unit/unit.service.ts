@@ -16,4 +16,38 @@ export class UnitService {
       },
     });
   }
+  async fake() {
+    const data = [
+      { unitName: 'Bộ' },
+      { unitName: 'Chai' },
+      { unitName: 'Cái' },
+      { unitName: 'Bag' },
+      { unitName: 'Box' },
+      { unitName: 'Can' },
+      { unitName: 'Cây' },
+      { unitName: 'Chiếc' },
+      { unitName: 'Cuộn' },
+      { unitName: 'Đôi' },
+      { unitName: 'EA' },
+      { unitName: 'KG' },
+      { unitName: 'Lọ' },
+      { unitName: 'Lon' },
+      { unitName: 'Mét' },
+      { unitName: 'Miếng' },
+      { unitName: 'Pair' },
+      { unitName: 'Quyển' },
+      { unitName: 'Ram' },
+      { unitName: 'Sợi' },
+      { unitName: 'Tấm' },
+      { unitName: 'Tập' },
+      { unitName: 'Thùng' },
+      { unitName: 'Tếp' },
+      { unitName: 'Tờ' },
+      { unitName: 'Túi' },
+      { unitName: 'Bì' },
+      { unitName: 'Vỉ' },
+      { unitName: 'Hộp' },
+    ];
+    return await this.unitRepo.insert(data);
+  }
 }

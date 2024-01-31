@@ -9,4 +9,9 @@ export class UnitController {
     const data = await this.unitService.getAll();
     return res.status(HttpStatus.OK).send(data);
   }
+  @Get('/fake')
+  async fake(@Res() res: Response) {
+    const data = await this.unitService.fake();
+    return res.status(HttpStatus.OK).send(data);
+  }
 }

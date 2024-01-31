@@ -27,25 +27,23 @@ import { StatusModule } from './status/status.module';
     TypeOrmModule.forRootAsync({
       useFactory: async (): Promise<ConnectionOptions> => {
         const connectionOptions: ConnectionOptions = {
-          type: 'mysql',
+          type: 'mssql',
           host: `${process.env.DB_HOST}`,
           port: parseInt(process.env.DB_PORT),
           username: `${process.env.DB_USERNAME}`,
           password: `${process.env.DB_PASSWORD}`,
           database: `${process.env.DB_DATABASE}`,
-          // options: { trustServerCertificate: true },
+          options: { trustServerCertificate: true }, //for mssql
           entities: [__dirname + '/../**/*.entity.js'],
-          logging: true, // for mysql
-          // requestTimeout: 30000, //for mssql
-          // entities: [
-          //   User,
-          // ],
+          // logging: true, // for mysql
+          requestTimeout: 30000, //for mssql
           synchronize: true,
-          // pool: { //for mssql
-          //   max: 10,
-          //   min: 0,
-          //   idleTimeoutMillis: 30000,
-          // },
+          pool: {
+            //for mssql
+            max: 10,
+            min: 0,
+            idleTimeoutMillis: 30000,
+          },
         };
 
         const connection = await createConnection(connectionOptions);
