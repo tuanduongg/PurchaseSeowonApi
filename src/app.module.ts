@@ -33,7 +33,11 @@ import { StatusModule } from './status/status.module';
           username: `${process.env.DB_USERNAME}`,
           password: `${process.env.DB_PASSWORD}`,
           database: `${process.env.DB_DATABASE}`,
+<<<<<<< HEAD
           options: { trustServerCertificate: true }, //for mssql
+=======
+          options: { trustServerCertificate: true },
+>>>>>>> ff5ab819a2365129e509a6286a692ec557f04233
           entities: [__dirname + '/../**/*.entity.js'],
           // logging: true, // for mysql
           requestTimeout: 30000, //for mssql
